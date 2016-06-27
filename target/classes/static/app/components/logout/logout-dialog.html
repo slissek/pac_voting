@@ -1,0 +1,19 @@
+<div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true" ng-click="vm.cancel()">&times;</button>
+    <h4 class="modal-title">Sign out</h4>
+</div>
+<div class="modal-body">
+    <div class="row">
+        <div class="col-md-8 col-md-offset-2">
+            <h6>Are you sure, that you want to sign out?</h6>
+        </div>
+    </div>
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn" ng-click="vm.logout()">
+        <span class="glyphicon glyphicon-log-out"></span>&nbsp; <span>Yes</span>
+    </button>
+    <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="vm.cancel()">
+        <span class="glyphicon glyphicon-ban-circle"></span>&nbsp; <span>Cancel</span>
+    </button>
+</div>

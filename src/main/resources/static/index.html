@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <!-- CSS (load bootstrap) -->
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+    <style>
+    .navbar {
+        border-radius: 0;
+    }
+    </style>
+        <link rel="stylesheet" href="content/css/vendor.css">
+    <!-- endbuild -->
+    <!-- build:css content/css/main.css -->
+    <link rel="stylesheet" href="content/css/main.css">
+    <!-- endbuild -->
+
+</head>
+<!-- apply our angular app to our site -->
+<body ng-app="VotingApp">
+    <!-- NAVIGATION -->
+    <nav class="navbar navbar-inverse" role="navigation">
+        <div class="navbar-header">
+            <a class="navbar-brand" ui-sref="#">Voting Application</a>
+        </div>
+        <ul class="nav navbar-nav navbar-right">
+            <li>
+                <a ui-sref="home">
+                    <span class="glyphicon glyphicon-home"></span>
+                    <span>Home</span>
+                </a>
+            </li>
+            <!-- TODO only if user admin -->
+            <li uib-dropdown class="dropdown pointer">
+                <a class="dropdown-toggle" uib-dropdown-toggle href="" id="admin-menu">
+                    <span>
+                        <span class="glyphicon glyphicon-wrench"></span>
+                        <span>Administration</span>
+                        <b class="caret"></b>
+                    </span>
+                </a>
+                <ul class="dropdown-menu" uib-dropdown-menu>
+                    <li ui-sref-active="active">
+                        <a ui-sref="user-management">
+                            <span class="glyphicon glyphicon-user"></span>&nbsp;
+                            <span>User management</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <a ui-sref="about">About</a>
+            </li>
+            <li>
+                <a ui-sref="signin">
+                    <span class="glyphicon glyphicon-log-in"></span>
+                    <span>Sign in</span>
+                </a>
+            </li>
+            <!-- TODO only if user authenticated -->
+            <li>
+                <a ui-sref="signout">
+                    <span class="glyphicon glyphicon-log-out"></span>
+                    <span>Sign out</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <!-- MAIN CONTENT -->
+    <div class="container">
+        <h1>Voting Application</h1>
+        <div ui-view></div>
+        
+    </div>
+    <div class="footer" ng-cloak>
+        <div class="container">
+            <p class="text-muted text-center">PRODYNA PAC Spring 2016, Sven Lissek</p>
+        </div>
+    </div>
+
+    <!-- build:js app/vendor.js -->
+    <!-- bower:js -->
+    <script src="bower_components/angular/angular.js"></script>
+    <script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
+    <script src="bower_components/angular-ui-router/release/angular-ui-router.js"></script>
+    <script src="bower_components/ngstorage/ngStorage.js"></script>
+    <script src="bower_components/angular-resource/angular-resource.js"></script>
+    <script src="bower_components/ngInfiniteScroll/build/ng-infinite-scroll.js"></script>
+    <!-- build:js app/app.js  -->
+    <!-- inject:js -->
+    <script src="app/app.js"></script>
+    <script src="app/app.state.js"></script>
+    <script src="app/admin/user-management/user-management.controller.js"></script>
+    <script src="app/admin/user-management/user-management-detail.controller.js"></script>
+    <script src="app/admin/user-management/user-management-dialog.controller.js"></script>
+    <script src="app/components/login/login-dialog.controller.js"></script>
+    <script src="app/components/logout/logout-dialog.controller.js"></script>
+    <script src="app/home/home.controller.js"></script>
+    <script src="app/home/vote-dialog.controller.js"></script>
+    <script src="app/services/auth/account.service.js"></script>
+    <script src="app/services/auth/auth.service.js"></script>
+    <script src="app/services/auth/auth.session.service.js"></script>
+    <script src="app/services/auth/principal.service.js"></script>
+    <script src="app/services/user/user.service.js"></script>
+
+    <!-- TODO delete me -->
+    <script src="app/about/scotch.controller.js"></script>
+</body>
+</html>

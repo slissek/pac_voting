@@ -1,0 +1,57 @@
+<div>
+    <h3>User Management</h3>
+    <div class="row">
+        <div class="text-right">
+            <button class="btn btn-primary" ui-sref="user-management.new">
+                <span class="glyphicon glyphicon-plus"></span>
+                <span>Create a new User</span>
+            </button>
+        </div>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Username</th>
+                    <th>Firstname</th>
+                    <th>Lastname</th>
+                    <th>Profiles</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="user in users track by user.id">
+                    <td>
+                        <a ui-sref="user-management-detail({login:user.id})">{{user.id}}</a>
+                    </td>
+                    <td>{{user.username}}</td>
+                    <td>{{user.firstname}}</td>
+                    <td>{{user.lastname}}</td>
+                    <td>
+                        <div ng-repeat="authority in user.authorities">
+                            <span class="label label-info">{{ authority.name }}</span>
+                        </div>
+                    </td>
+                    <td class="text-right">
+                        <div class="btn-group flex-btn-group-container">
+                            <button type="submit" ui-sref="user-management-detail({login:user.id})" class="btn btn-info btn-sm">
+                                <span class="glyphicon glyphicon-eye-open"></span>
+                                <span class="hidden-xs hidden-sm"></span>
+                            </button>
+                            <button type="submit"
+                                    ui-sref="user-management.edit({login:user.id})" class="btn btn-primary btn-sm">
+                                <span class="glyphicon glyphicon-pencil"></span>
+                                <span class="hidden-xs hidden-sm"></span>
+                            </button>
+                            <button type="submit"
+                                    ui-sref="user-management.delete({login:user.id})" class="btn btn-danger btn-sm" ng-disabled="vm.currentAccount.login==user.id">
+                                <span class="glyphicon glyphicon-remove-circle"></span>
+                                <span class="hidden-xs hidden-sm" translate="entity.action.delete"></span>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

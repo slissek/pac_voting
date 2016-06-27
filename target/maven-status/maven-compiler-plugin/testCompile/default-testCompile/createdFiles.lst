@@ -1,0 +1,8 @@
+com/prodyna/pac/voting/web/rest/VoteOptionsResourceIntTest.class
+com/prodyna/pac/VotingApplicationTests.class
+com/prodyna/pac/voting/web/rest/TestUtil.class
+com/prodyna/pac/voting/web/rest/VoteResourceIntTest.class
+com/prodyna/pac/voting/service/UserServiceIntTest.class
+com/prodyna/pac/voting/security/SecurityUtilsUnitTest.class
+com/prodyna/pac/voting/web/rest/UserVotingsResourceIntTest.class
+com/prodyna/pac/voting/web/rest/UserResourceIntTest.class
