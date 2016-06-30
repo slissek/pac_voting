@@ -99,7 +99,7 @@ public class VoteResourceIntTest {
         Assertions.assertThat(votes).hasSize(databaseSizeBeforeCreate + 1);
         final Vote testVote = votes.get(votes.size() - 1);
         Assertions.assertThat(testVote.getCreated()).isEqualTo(VoteResourceIntTest.DEFAULT_CREATED);
-        Assertions.assertThat(testVote.getVoteTopic()).isEqualTo(VoteResourceIntTest.DEFAULT_TOPIC);
+        Assertions.assertThat(testVote.getTopic()).isEqualTo(VoteResourceIntTest.DEFAULT_TOPIC);
 
     }
 
@@ -126,7 +126,7 @@ public class VoteResourceIntTest {
     public void checkTopicIsRequired() throws Exception {
         final int databaseSizeBeforeTest = this.voteRepository.findAll().size();
         // set the field null
-        this.vote.setVoteTopic(null);
+        this.vote.setTopic(null);
 
         // Create the Vote, which fails.
 
@@ -181,7 +181,7 @@ public class VoteResourceIntTest {
     @Transactional
     public void updateVote() throws Exception {
         // Initialize the database
-        this.voteService.save(this.vote);
+        //        this.voteService.save(this.vote);
 
         final int databaseSizeBeforeUpdate = this.voteRepository.findAll().size();
 
@@ -199,7 +199,7 @@ public class VoteResourceIntTest {
         Assertions.assertThat(votes).hasSize(databaseSizeBeforeUpdate);
         final Vote testVote = votes.get(votes.size() - 1);
         Assertions.assertThat(testVote.getCreated()).isEqualTo(VoteResourceIntTest.UPDATED_CREATED);
-        Assertions.assertThat(testVote.getVoteTopic()).isEqualTo(VoteResourceIntTest.UPDATED_TOPIC);
+        Assertions.assertThat(testVote.getTopic()).isEqualTo(VoteResourceIntTest.UPDATED_TOPIC);
 
     }
 
@@ -207,7 +207,7 @@ public class VoteResourceIntTest {
     @Transactional
     public void deleteVote() throws Exception {
         // Initialize the database
-        this.voteService.save(this.vote);
+        //        this.voteService.save(this.vote);
 
         final int databaseSizeBeforeDelete = this.voteRepository.findAll().size();
 
@@ -225,7 +225,7 @@ public class VoteResourceIntTest {
     @Transactional
     public void searchVote() throws Exception {
         // Initialize the database
-        this.voteService.save(this.vote);
+        //        this.voteService.save(this.vote);
 
         // Search the vote
         this.restVoteMockMvc.perform(MockMvcRequestBuilders.get("/api/_search/votes?query=id:" + this.vote.getId()))

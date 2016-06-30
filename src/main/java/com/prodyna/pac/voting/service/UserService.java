@@ -13,11 +13,11 @@ public interface UserService
     /**
      * Save a users.
      *
-     * @param users
+     * @param userDTO
      *            the entity to save
      * @return the persisted entity
      */
-    User save(ManagedUserDTO users);
+    User save(ManagedUserDTO userDTO);
 
     /**
      * Get all the users.

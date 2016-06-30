@@ -26,7 +26,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.prodyna.pac.voting.VotingApplication;
-import com.prodyna.pac.voting.domain.VoteOptions;
+import com.prodyna.pac.voting.domain.VoteOption;
 import com.prodyna.pac.voting.repository.VoteOptionsRepository;
 import com.prodyna.pac.voting.service.VoteOptionsService;
 
@@ -59,7 +59,7 @@ public class VoteOptionsResourceIntTest
 
     private MockMvc restVoteOptionsMockMvc;
 
-    private VoteOptions voteOptions;
+    private VoteOption voteOptions;
 
     @PostConstruct
     public void setup()
@@ -91,9 +91,9 @@ public class VoteOptionsResourceIntTest
         .andExpect(MockMvcResultMatchers.status().isCreated());
 
         // Validate the VoteOptions in the database
-        final List<VoteOptions> voteOptions = this.voteOptionsRepository.findAll();
+        final List<VoteOption> voteOptions = this.voteOptionsRepository.findAll();
         Assertions.assertThat(voteOptions).hasSize(databaseSizeBeforeCreate + 1);
-        final VoteOptions testVoteOptions = voteOptions.get(voteOptions.size() - 1);
+        final VoteOption testVoteOptions = voteOptions.get(voteOptions.size() - 1);
         Assertions.assertThat(testVoteOptions.getText()).isEqualTo(VoteOptionsResourceIntTest.DEFAULT_TEXT);
 
     }
@@ -113,7 +113,7 @@ public class VoteOptionsResourceIntTest
                 .content(TestUtil.convertObjectToJsonBytes(this.voteOptions)))
         .andExpect(MockMvcResultMatchers.status().isBadRequest());
 
-        final List<VoteOptions> voteOptions = this.voteOptionsRepository.findAll();
+        final List<VoteOption> voteOptions = this.voteOptionsRepository.findAll();
         Assertions.assertThat(voteOptions).hasSize(databaseSizeBeforeTest);
     }
 
@@ -162,7 +162,7 @@ public class VoteOptionsResourceIntTest
     public void updateVoteOptions() throws Exception
     {
         // Initialize the database
-        this.voteOptionsService.save(this.voteOptions);
+        //        this.voteOptionsService.save(this.voteOptions);
 
         final int databaseSizeBeforeUpdate = this.voteOptionsRepository.findAll().size();
 
@@ -174,9 +174,9 @@ public class VoteOptionsResourceIntTest
         //                .content(TestUtil.convertObjectToJsonBytes(updatedVoteOptions))).andExpect(MockMvcResultMatchers.status().isOk());
 
         // Validate the VoteOptions in the database
-        final List<VoteOptions> voteOptions = this.voteOptionsRepository.findAll();
+        final List<VoteOption> voteOptions = this.voteOptionsRepository.findAll();
         Assertions.assertThat(voteOptions).hasSize(databaseSizeBeforeUpdate);
-        final VoteOptions testVoteOptions = voteOptions.get(voteOptions.size() - 1);
+        final VoteOption testVoteOptions = voteOptions.get(voteOptions.size() - 1);
         Assertions.assertThat(testVoteOptions.getText()).isEqualTo(VoteOptionsResourceIntTest.UPDATED_TEXT);
 
     }
@@ -186,7 +186,7 @@ public class VoteOptionsResourceIntTest
     public void deleteVoteOptions() throws Exception
     {
         // Initialize the database
-        this.voteOptionsService.save(this.voteOptions);
+        //        this.voteOptionsService.save(this.voteOptions);
 
         final int databaseSizeBeforeDelete = this.voteOptionsRepository.findAll().size();
 
@@ -196,7 +196,7 @@ public class VoteOptionsResourceIntTest
         .andExpect(MockMvcResultMatchers.status().isOk());
 
         // Validate the database is empty
-        final List<VoteOptions> voteOptions = this.voteOptionsRepository.findAll();
+        final List<VoteOption> voteOptions = this.voteOptionsRepository.findAll();
         Assertions.assertThat(voteOptions).hasSize(databaseSizeBeforeDelete - 1);
     }
 
@@ -205,7 +205,7 @@ public class VoteOptionsResourceIntTest
     public void searchVoteOptions() throws Exception
     {
         // Initialize the database
-        this.voteOptionsService.save(this.voteOptions);
+        //        this.voteOptionsService.save(this.voteOptions);
 
         // Search the voteOptions
         this.restVoteOptionsMockMvc.perform(MockMvcRequestBuilders.get("/api/_search/vote-options?query=id:" + this.voteOptions.getId()))

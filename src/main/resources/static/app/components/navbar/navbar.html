@@ -1,0 +1,49 @@
+<nav class="navbar navbar-inverse" role="navigation">
+    <div class="navbar-header">
+        <a class="navbar-brand" ui-sref="#">Voting Application</a>
+    </div>
+    <div class="navbar-collapse" ng-switch="vm.isAuthenticated()">
+        <ul class="nav navbar-nav navbar-right">
+            <li>
+                <a ui-sref="home"> 
+                    <span class="glyphicon glyphicon-home"></span> 
+                    <span>Home</span>
+                </a>
+            </li>
+            <!-- TODO only if user admin -->
+            <li uib-dropdown class="dropdown pointer" ng-switch-when="true" has-authority="ROLE_ADMIN" >
+                <a class="dropdown-toggle" uib-dropdown-toggle href="" id="admin-menu"> 
+                    <span> 
+                        <span class="glyphicon glyphicon-wrench"></span> 
+                        <span>Administration</span>
+                        <b class="caret"></b>
+                    </span>
+                </a>
+                <ul class="dropdown-menu" uib-dropdown-menu>
+                    <li ui-sref-active="active">
+                        <a ui-sref="user-management"> 
+                        <span class="glyphicon glyphicon-user"></span>&nbsp; 
+                        <span>User management</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <a ui-sref="about">About</a>
+            </li>
+            <li ng-switch-when="false">
+                <a ui-sref="signin"> 
+                    <span class="glyphicon glyphicon-log-in"></span> 
+                    <span>Sign in</span>
+                </a>
+            </li>
+            <!-- TODO only if user authenticated -->
+            <li ng-switch-when="true">
+                <a ui-sref="signout"> 
+                    <span class="glyphicon glyphicon-log-out"></span> 
+                    <span>Sign out</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+</nav>

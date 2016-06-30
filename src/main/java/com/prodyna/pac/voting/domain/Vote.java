@@ -51,11 +51,10 @@ public class Vote implements Serializable
     private String topic;
 
     @OneToMany(mappedBy = "vote")
-    private final Set<VoteOptions> voteOptions = new HashSet<>();
+    private Set<VoteOption> voteOptions = new HashSet<>();
 
-    protected Vote()
+    public Vote()
     {
-        // jpa only
     }
 
     /**
@@ -76,10 +75,13 @@ public class Vote implements Serializable
         this.topic = voteTopic;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString()
     {
-        return String.format("Vote [id=%d, creator=%d, created=%tc, topic='%s']", this.id, this.creator, this.created, this.topic);
+        return String.format("Vote [id=%s, creator=%s, created=%s, topic=%s, voteOptions=%s]", this.id, this.creator, this.created, this.topic, this.voteOptions);
     }
 
     @Override
@@ -159,23 +161,6 @@ public class Vote implements Serializable
     }
 
     /**
-     * @return the voteTopic
-     */
-    public String getVoteTopic()
-    {
-        return this.topic;
-    }
-
-    /**
-     * @param voteTopic
-     *            the voteTopic to set
-     */
-    public void setVoteTopic(final String voteTopic)
-    {
-        this.topic = voteTopic;
-    }
-
-    /**
      * @return the topic
      */
     public String getTopic()
@@ -184,11 +169,27 @@ public class Vote implements Serializable
     }
 
     /**
+     * @param topic the topic to set
+     */
+    public void setTopic(final String topic)
+    {
+        this.topic = topic;
+    }
+
+    /**
      * @return the voteOptions
      */
-    public Set<VoteOptions> getVoteOptions()
+    public Set<VoteOption> getVoteOptions()
     {
         return this.voteOptions;
+    }
+
+    /**
+     * @param voteOptions the voteOptions to set
+     */
+    public void setVoteOptions(final Set<VoteOption> voteOptions)
+    {
+        this.voteOptions = voteOptions;
     }
 
 

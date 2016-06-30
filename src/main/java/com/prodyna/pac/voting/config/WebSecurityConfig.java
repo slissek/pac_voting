@@ -18,6 +18,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.csrf.CsrfFilter;
+import org.springframework.security.data.repository.query.SecurityEvaluationContextExtension;
 
 import com.prodyna.pac.voting.security.AjaxAuthenticationFailureHandler;
 import com.prodyna.pac.voting.security.AjaxAuthenticationSuccessHandler;
@@ -58,6 +59,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter
     @Inject
     private SessionRegistry sessionRegistry;
 
+    @Bean
+    public SecurityEvaluationContextExtension securityEvaluationContextExtension() {
+        return new SecurityEvaluationContextExtension();
+    }
+    
     @Bean(name = "passwordEncoder")
     public PasswordEncoder passwordEncoder()
     {
@@ -77,19 +83,19 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter
         http
             .sessionManagement()
             .maximumSessions(32) // maximum number of concurrent sessions for one user
-            .sessionRegistry(this.sessionRegistry)
+            .sessionRegistry(sessionRegistry)
             .and().and()
             .csrf()
         .and()
             .addFilterAfter(new CsrfCookieGeneratorFilter(), CsrfFilter.class)
             .exceptionHandling()
             .accessDeniedHandler(new CustomAccessDeniedHandler())
-            .authenticationEntryPoint(this.authenticationEntryPoint)
+            .authenticationEntryPoint(authenticationEntryPoint)
         .and()
             .rememberMe()
-            .rememberMeServices(this.rememberMeServices)
+            .rememberMeServices(rememberMeServices)
             .rememberMeParameter("remember-me")
-            .key(this.applicationProerties.getSecurity().getRememberMe().getKey())
+            .key(applicationProerties.getSecurity().getRememberMe().getKey())
         .and()
             .formLogin()
             .loginProcessingUrl("/api/authentication")
@@ -114,4 +120,5 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter
             .antMatchers("/api/**").authenticated();
     }
     // @formatter:on
+
 }

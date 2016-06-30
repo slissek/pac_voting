@@ -21,7 +21,7 @@ body {
 
 
 /* ==========================================================================
-ui bootstrap tweaks
+ui bootstrap adaptions
 ========================================================================== */
 @media (min-width: 768px) {
   .navbar-left {
@@ -34,6 +34,15 @@ ui bootstrap tweaks
    .navbar-right ~ .navbar-right {
       margin-right: 0; 
    } 
+}
+
+.alert-warning .alert-link {
+    color: #286fb1;
+}
+
+h5, .h5 .warning {
+        color : red;
+    }
 }
 
 /* ==========================================================================

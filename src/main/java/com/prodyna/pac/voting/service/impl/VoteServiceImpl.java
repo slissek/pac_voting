@@ -1,17 +1,19 @@
 package com.prodyna.pac.voting.service.impl;
 
+import java.util.List;
+
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.prodyna.pac.voting.domain.Vote;
 import com.prodyna.pac.voting.repository.VoteRepository;
 import com.prodyna.pac.voting.service.VoteService;
+import com.prodyna.pac.voting.web.rest.converter.VoteConverter;
+import com.prodyna.pac.voting.web.rest.dto.VoteDTO;
 
 /**
  * Service Implementation for managing Vote.
@@ -29,16 +31,17 @@ public class VoteServiceImpl implements VoteService
     /**
      * Save a vote.
      *
-     * @param vote
+     * @param voteDTO
      *            the entity to save
      * @return the persisted entity
      */
     @Override
-    public Vote save(final Vote vote)
+    public Vote save(final VoteDTO voteDTO)
     {
+        final Vote vote = VoteConverter.toEntity(voteDTO);
         final Vote result = this.voteRepository.save(vote);
 
-        this.log.debug("Saved Vote : {}", vote);
+        this.log.debug("Saved Vote : {}", voteDTO);
 
         return result;
     }
@@ -52,10 +55,11 @@ public class VoteServiceImpl implements VoteService
      */
     @Override
     @Transactional(readOnly = true)
-    public Page<Vote> findAll(final Pageable pageable)
+    public List<Vote> getAll()
     {
         this.log.debug("Request to get all Votes");
-        final Page<Vote> result = this.voteRepository.findAll(pageable);
+
+        final List<Vote> result = this.voteRepository.findAll();
         return result;
     }
 

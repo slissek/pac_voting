@@ -23,6 +23,7 @@ import com.prodyna.pac.voting.domain.User;
 import com.prodyna.pac.voting.repository.PersistentTokenRepository;
 import com.prodyna.pac.voting.security.SecurityUtils;
 import com.prodyna.pac.voting.service.UserService;
+import com.prodyna.pac.voting.web.rest.converter.UserConverter;
 import com.prodyna.pac.voting.web.rest.dto.ManagedUserDTO;
 import com.prodyna.pac.voting.web.rest.util.HeaderUtil;
 
@@ -68,7 +69,7 @@ public class AccountResource
     public ResponseEntity<ManagedUserDTO> getAccount()
     {
         return Optional.ofNullable(this.userService.getUserWithAuthorities())
-                .map(user -> new ResponseEntity<>(new ManagedUserDTO(user), HttpStatus.OK))
+                .map(user -> new ResponseEntity<>(UserConverter.toDto(user), HttpStatus.OK))
                 .orElse(new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
     }
 

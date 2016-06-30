@@ -10,12 +10,48 @@
         $urlRouterProvider.otherwise('/home');
 
         $stateProvider
+        .state('app',
+        {
+            abstract: true,
+            views: {
+                'navbar@': {
+                    templateUrl: 'app/components/navbar/navbar.html',
+                    controller: 'NavigationController',
+                    controllerAs: 'vm'
+                }
+            }
+        })
+
+        .state('entity', 
+        {
+            abstract: true,
+            parent: 'app'
+        })
+
+        .state('admin', 
+        {
+            abstract: true,
+            parent: 'app'
+        })
+
         // HOME STATES AND NESTED VIEWS
         .state('home',
         {
+            parent : 'app',
             url : '/home',
-            templateUrl : 'app/home/home.html',
-            controller : 'HomeController'
+            views: {
+                'content@' : {
+                    templateUrl : 'app/home/home.html',
+                    controller : 'HomeController',
+                    controllerAs: 'vm'
+                },
+
+                'votes@home' : {
+                    templateUrl : 'app/votes/votes.html',
+                    controller : 'VotesController',
+                    controllerAs: 'vm'
+                }
+            }
         })
 
         .state('home.new',
@@ -24,38 +60,51 @@
             url : '/new',
             onEnter: ['$stateParams', '$state', '$uibModal', function($stateParams, $state, $uibModal) {
                 $uibModal.open({
-                    templateUrl: 'app/voting/user-management/user-management-dialog.html',
-                    controller: 'UserManagementDialogController',
+                    templateUrl: 'app/votes/vote-dialog.html',
+                    controller: 'VoteDialogController',
                     controllerAs: 'vm',
                     backdrop: 'static',
-                    size: 'sm',
+                    size: 'lg',
                     resolve: {
                         entity: function () {
                             return {
-                                id: null, username: null, firstName: null, lastName: null, authorities: null
+                                // TODO
                             };
                         }
                     }
                 }).result.then(function() {
-                    $state.go('user-management', null, { reload: true });
+                    $state.go('home', null, { reload: true });
                 }, function() {
-                    $state.go('user-management');
+                    $state.go('home');
                 });
-            }]
+            }],
         })
 
         // ADMINISTRATION
         .state('user-management',
         {
+            parent : 'admin',
             url : '/user-management',
-            templateUrl : 'app/admin/user-management/user-management.html',
-            controller : 'UserManagementController'
+            data: {
+                authorities: ['ROLE_ADMIN']
+            },
+            views: {
+                'content@' :
+                {
+                    templateUrl : 'app/admin/user-management/user-management.html',
+                    controller : 'UserManagementController',
+                    controllerAs: 'vm'
+                }
+            }
         })
 
         .state('user-management.new',
         {
             parent : 'user-management',
             url : '/new',
+            data: {
+                authorities: ['ROLE_ADMIN']
+            },
             onEnter: ['$stateParams', '$state', '$uibModal', function($stateParams, $state, $uibModal) {
                 $uibModal.open({
                     templateUrl: 'app/admin/user-management/user-management-dialog.html',
@@ -78,21 +127,84 @@
             }]
         })
 
+        .state('user-management.edit', 
+        {
+            parent: 'user-management',
+            url: '/{id}/edit',
+            data: {
+                authorities: ['ROLE_ADMIN']
+            },
+            onEnter: ['$stateParams', '$state', '$uibModal', function($stateParams, $state, $uibModal) {
+                $uibModal.open({
+                    templateUrl: 'app/admin/user-management/user-management-dialog.html',
+                    controller: 'UserManagementDialogController',
+                    controllerAs: 'vm',
+                    backdrop: 'static',
+                    size: 'sm',
+                    resolve: {
+                        entity: ['User', function(User) {
+                            return User.get({id : $stateParams.id});
+                        }]
+                    }
+                }).result.then(function() {
+                    $state.go('user-management', null, { reload: true });
+                }, function() {
+                    $state.go('^');
+                });
+            }]
+        })
+
         .state('user-management-detail',
         {
+            parent : 'admin',
             url : '/user-management-detail',
-            templateUrl : 'app/admin/user-management/user-management-detail.html',
-            controller : 'UserManagementDetailController'
+            data: {
+                authorities: ['ROLE_ADMIN']
+            },
+            views: {
+                'content@' :
+                {
+                    templateUrl : 'app/admin/user-management/user-management-detail.html',
+                    controller : 'UserManagementDetailController',
+                    controllerAs: 'vm'
+                }
+            }
         })
-        
+
+        .state('user-management.delete', {
+            parent: 'user-management',
+            url: '/{id}/delete',
+            data: {
+                authorities: ['ROLE_ADMIN']
+            },
+            onEnter: ['$stateParams', '$state', '$uibModal', function($stateParams, $state, $uibModal) {
+                $uibModal.open({
+                    templateUrl: 'app/admin/user-management/user-magagement-delete-dialog.html',
+                    controller: 'UserManagementDeleteController',
+                    controllerAs: 'vm',
+                    size: 'sm',
+                    resolve: {
+                        entity: ['User', function(User) {
+                            return User.get({id : $stateParams.id});
+                        }]
+                    }
+                }).result.then(function() {
+                    $state.go('user-management', null, { reload: true });
+                }, function() {
+                    $state.go('^');
+                });
+            }]
+        })
+
         // ABOUT PAGE AND MULTIPLE NAMED VIEWS
         .state('about',
         {
+            parent : 'app',
             url : '/about',
             views :
             {
                 // the main template will be placed here (relatively named)
-                '' :
+                'content@' :
                 {
                     templateUrl : 'app/about/partial-about.html'
                 },
@@ -114,6 +226,7 @@
 
         .state('signin', 
         {
+            parent : 'app',
             url : '/signin',
             onEnter: ['$stateParams', '$state', '$uibModal', function($stateParams, $state, $uibModal) {
                 $uibModal.open({
@@ -138,6 +251,7 @@
 
         .state('signout', 
         {
+            parent : 'app',
             url : '/signout',
             onEnter: ['$stateParams', '$state', '$uibModal', function($stateParams, $state, $uibModal) {
                 $uibModal.open({
@@ -158,6 +272,34 @@
                     $state.go('home');
                 });
             }]
+        })
+
+        .state('error', 
+        {
+            parent: 'app',
+            url: '/error',
+            data: {
+                authorities: [],
+            },
+            views: {
+                'content@': {
+                    templateUrl: 'app/components/error/error.html'
+                }
+            }
+        })
+
+        .state('accessdenied', 
+        {
+            parent: 'app',
+            url: '/accessdenied',
+            data: {
+                authorities: []
+            },
+            views: {
+                'content@': {
+                    templateUrl: 'app/components/error/accessdenied.html'
+                }
+            }
         })
     }
 })();

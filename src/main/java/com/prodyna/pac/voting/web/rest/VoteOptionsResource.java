@@ -19,8 +19,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.prodyna.pac.voting.domain.VoteOptions;
+import com.prodyna.pac.voting.domain.VoteOption;
 import com.prodyna.pac.voting.service.VoteOptionsService;
+import com.prodyna.pac.voting.web.rest.converter.VoteOptionConverter;
+import com.prodyna.pac.voting.web.rest.dto.VoteOptionDTO;
 import com.prodyna.pac.voting.web.rest.util.HeaderUtil;
 
 /**
@@ -28,7 +30,8 @@ import com.prodyna.pac.voting.web.rest.util.HeaderUtil;
  */
 @RestController
 @RequestMapping("/api")
-public class VoteOptionsResource {
+public class VoteOptionsResource
+{
 
     private final Logger log = LoggerFactory.getLogger(VoteOptionsResource.class);
 
@@ -36,78 +39,85 @@ public class VoteOptionsResource {
     private VoteOptionsService voteOptionsService;
 
     /**
-     * POST  /vote-options : Create a new voteOptions.
+     * POST /vote-options : Create a new voteOptions.
      *
-     * @param voteOptions the voteOptions to create
-     * @return the ResponseEntity with status 201 (Created) and with body the new voteOptions, or with status 400 (Bad Request) if the voteOptions has already an ID
-     * @throws URISyntaxException if the Location URI syntax is incorrect
+     * @param voteOptionsDTO
+     *            the voteOptions to create
+     * @return the ResponseEntity with status 201 (Created) and with body the new voteOptions, or with status 400 (Bad Request) if the
+     *         voteOptions has already an ID
+     * @throws URISyntaxException
+     *             if the Location URI syntax is incorrect
      */
-    @RequestMapping(value = "/vote-options",
-            method = RequestMethod.POST,
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    //    @Timed
-    public ResponseEntity<VoteOptions> createVoteOptions(@Valid @RequestBody final VoteOptions voteOptions) throws URISyntaxException {
-        this.log.debug("REST request to save VoteOptions : {}", voteOptions);
-        if (voteOptions.getId() != null) {
-            return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("voteOptions", "idexists", "A new voteOptions cannot already have an ID")).body(null);
+    @RequestMapping(value = "/vote-options", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    // @Timed
+    public ResponseEntity<VoteOptionDTO> createVoteOptions(@Valid @RequestBody final VoteOptionDTO voteOptionsDTO) throws URISyntaxException
+    {
+        this.log.debug("REST request to save VoteOptions : {}", voteOptionsDTO);
+
+        if (voteOptionsDTO.getId() != null)
+        {
+            return ResponseEntity.badRequest()
+                    .headers(HeaderUtil.createFailureAlert("voteOptions", "idexists", "A new voteOptions cannot already have an ID"))
+                    .body(null);
         }
-        final VoteOptions result = this.voteOptionsService.save(voteOptions);
+
+        final VoteOptionDTO result = VoteOptionConverter.toDto(this.voteOptionsService.save(voteOptionsDTO));
         return ResponseEntity.created(new URI("/api/vote-options/" + result.getId()))
                 .headers(HeaderUtil.createEntityCreationAlert("voteOptions", result.getId().toString()))
                 .body(result);
     }
 
     /**
-     * PUT  /vote-options : Updates an existing voteOptions.
+     * PUT /vote-options : Updates an existing voteOptions.
      *
-     * @param voteOptions the voteOptions to update
-     * @return the ResponseEntity with status 200 (OK) and with body the updated voteOptions,
-     * or with status 400 (Bad Request) if the voteOptions is not valid,
-     * or with status 500 (Internal Server Error) if the voteOptions couldnt be updated
-     * @throws URISyntaxException if the Location URI syntax is incorrect
+     * @param voteOptionsDTO
+     *            the voteOptions to update
+     * @return the ResponseEntity with status 200 (OK) and with body the updated voteOptions, or with status 400 (Bad Request) if the
+     *         voteOptions is not valid, or with status 500 (Internal Server Error) if the voteOptions couldnt be updated
+     * @throws URISyntaxException
+     *             if the Location URI syntax is incorrect
      */
-    @RequestMapping(value = "/vote-options",
-            method = RequestMethod.PUT,
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    //    @Timed
-    public ResponseEntity<VoteOptions> updateVoteOptions(@Valid @RequestBody final VoteOptions voteOptions) throws URISyntaxException {
-        this.log.debug("REST request to update VoteOptions : {}", voteOptions);
-        if (voteOptions.getId() == null) {
-            return this.createVoteOptions(voteOptions);
+    @RequestMapping(value = "/vote-options", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+    // @Timed
+    public ResponseEntity<VoteOptionDTO> updateVoteOptions(@Valid @RequestBody final VoteOptionDTO voteOptionsDTO) throws URISyntaxException
+    {
+        this.log.debug("REST request to update VoteOptions : {}", voteOptionsDTO);
+        if (voteOptionsDTO.getId() == null)
+        {
+            return this.createVoteOptions(voteOptionsDTO);
         }
-        final VoteOptions result = this.voteOptionsService.save(voteOptions);
+        final VoteOptionDTO result = VoteOptionConverter.toDto(this.voteOptionsService.save(voteOptionsDTO));
         return ResponseEntity.ok()
-                .headers(HeaderUtil.createEntityUpdateAlert("voteOptions", voteOptions.getId().toString()))
+                .headers(HeaderUtil.createEntityUpdateAlert("voteOptions", voteOptionsDTO.getId().toString()))
                 .body(result);
     }
 
     /**
-     * GET  /vote-options : get all the voteOptions.
+     * GET /vote-options : get all the voteOptions.
      *
      * @return the ResponseEntity with status 200 (OK) and the list of voteOptions in body
      */
-    @RequestMapping(value = "/vote-options",
-            method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    //    @Timed
-    public List<VoteOptions> getAllVoteOptions() {
+    @RequestMapping(value = "/vote-options", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    // @Timed
+    public List<VoteOptionDTO> getAllVoteOptions()
+    {
         this.log.debug("REST request to get all VoteOptions");
-        return this.voteOptionsService.findAll();
+        return VoteOptionConverter.toDtoList(this.voteOptionsService.findAll());
     }
 
     /**
-     * GET  /vote-options/:id : get the "id" voteOptions.
+     * GET /vote-options/:id : get the "id" voteOptions.
      *
-     * @param id the id of the voteOptions to retrieve
+     * @param id
+     *            the id of the voteOptions to retrieve
      * @return the ResponseEntity with status 200 (OK) and with body the voteOptions, or with status 404 (Not Found)
      */
-    @RequestMapping(value = "/vote-options/{id}",
-            method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    //    @Timed
-    public ResponseEntity<VoteOptions> getVoteOptions(@PathVariable final Long id) {
+    @RequestMapping(value = "/vote-options/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    // @Timed
+    public ResponseEntity<VoteOption> getVoteOptions(@PathVariable final Long id)
+    {
         this.log.debug("REST request to get VoteOptions : {}", id);
-        final VoteOptions voteOptions = this.voteOptionsService.findOne(id);
+        final VoteOption voteOptions = this.voteOptionsService.findOne(id);
         return Optional.ofNullable(voteOptions)
                 .map(result -> new ResponseEntity<>(
                         result,
@@ -116,16 +126,16 @@ public class VoteOptionsResource {
     }
 
     /**
-     * DELETE  /vote-options/:id : delete the "id" voteOptions.
+     * DELETE /vote-options/:id : delete the "id" voteOptions.
      *
-     * @param id the id of the voteOptions to delete
+     * @param id
+     *            the id of the voteOptions to delete
      * @return the ResponseEntity with status 200 (OK)
      */
-    @RequestMapping(value = "/vote-options/{id}",
-            method = RequestMethod.DELETE,
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    //    @Timed
-    public ResponseEntity<Void> deleteVoteOptions(@PathVariable final Long id) {
+    @RequestMapping(value = "/vote-options/{id}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
+    // @Timed
+    public ResponseEntity<Void> deleteVoteOptions(@PathVariable final Long id)
+    {
         this.log.debug("REST request to delete VoteOptions : {}", id);
         this.voteOptionsService.delete(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert("voteOptions", id.toString())).build();

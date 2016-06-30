@@ -8,7 +8,7 @@
 
     function User($resource)
     {
-        var service = $resource('api/users/:login', {}, {
+        var service = $resource('api/users/:id', {}, {
             'query': {method: 'GET', isArray: true},
             'get': {
                 method: 'GET',

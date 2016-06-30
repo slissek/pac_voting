@@ -1,13 +1,9 @@
 package com.prodyna.pac.voting.web.rest.dto;
 
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-
-import com.prodyna.pac.voting.domain.Authority;
-import com.prodyna.pac.voting.domain.User;
 
 /**
  * A DTO extending the UserDTO, which is meant to be used in the user management UI.
@@ -37,12 +33,6 @@ public class ManagedUserDTO
 
     public ManagedUserDTO()
     {
-    }
-
-    public ManagedUserDTO(final User user)
-    {
-        this(user.getId(), user.getUserName(), user.getFirstName(), user.getLastName(), user.getPassword(),
-                user.getAuthorities().stream().map(Authority::getName).collect(Collectors.toSet()));
     }
 
     public ManagedUserDTO(final Long userId, final String userName, final String firstName, final String lastName, final String password,

@@ -21,24 +21,19 @@ public class CsrfCookieGeneratorFilter extends OncePerRequestFilter
     protected void doFilterInternal(final HttpServletRequest request, final HttpServletResponse response, final FilterChain filterChain)
             throws ServletException, IOException
     {
-        final CsrfToken csrfToken = (CsrfToken) request.getAttribute(CsrfToken.class.getName());
+     // Spring put the CSRF token in session attribute "_csrf"
+        CsrfToken csrfToken = (CsrfToken) request.getAttribute("_csrf");
 
-        if (csrfToken != null)
-        {
-            Cookie cookie = WebUtils.getCookie(request, "X-CSRF-TOKEN");
-            final String token = csrfToken.getToken();
-
-            // Send the cookie only if the token has changed
-            if ((cookie == null) || ((token != null) && !token.equals(cookie.getValue())))
-            {
-                // Session cookie that will be used by AngularJS
-                cookie = new Cookie("CSRF_TOKEN", token);
-                cookie.setMaxAge(-1);
-                cookie.setHttpOnly(false);
-                cookie.setPath("/");
-
-                response.addCookie(cookie);
-            }
+        // Send the cookie only if the token has changed
+        String actualToken = request.getHeader("X-CSRF-TOKEN");
+        if (actualToken == null || !actualToken.equals(csrfToken.getToken())) {
+            // Session cookie that will be used by AngularJS
+            String pCookieName = "CSRF-TOKEN";
+            Cookie cookie = new Cookie(pCookieName, csrfToken.getToken());
+            cookie.setMaxAge(-1);
+            cookie.setHttpOnly(false);
+            cookie.setPath("/");
+            response.addCookie(cookie);
         }
         filterChain.doFilter(request, response);
     }

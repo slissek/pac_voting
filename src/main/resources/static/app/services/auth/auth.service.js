@@ -4,22 +4,49 @@
 
     angular.module('VotingApp').factory('Auth', Auth);
 
-    Auth.$inject = ['$q', 'Principal', 'AuthServerProvider'];
+    Auth.$inject = ['$rootScope', '$state', '$q', 'Principal', 'AuthSessionProvider'];
 
-    function Auth($q, Principal, AuthServerProvider)
+    function Auth($rootScope, $state, $q, Principal, AuthSessionProvider)
     {
         var service = {
+            authorize: authorize,
             login: login,
             logout: logout
         }
 
         return service;
 
+        function authorize (force) {
+            var authReturn = Principal.identity(force).then(authThen);
+
+            return authReturn;
+
+            function authThen () {
+                var isAuthenticated = Principal.isAuthenticated();
+
+                // an authenticated user can't access to signin page
+                if (isAuthenticated && $rootScope.toState.parent === 'account' && $rootScope.toState.name === 'signin')
+                {
+                    $state.go('home');
+                }
+
+                if ($rootScope.toState.data.authorities && $rootScope.toState.data.authorities.length > 0 && 
+                        !Principal.hasAnyAuthority($rootScope.toState.data.authorities)) {
+                    if (isAuthenticated) {
+                        // user is signed in but not authorized for desired state
+                        $state.go('accessdenied');
+                    } else {
+                        $state.go('signin');
+                    }
+                }
+            }
+        }
+
         function login (credentials, callback) {
             var cb = callback || angular.noop;
             var deferred = $q.defer();
 
-            AuthServerProvider.login(credentials)
+            AuthSessionProvider.login(credentials)
                 .then(loginThen)
                 .catch(function (err) {
                     this.logout();
@@ -29,13 +56,6 @@
 
             function loginThen (data) {
                 Principal.identity(true).then(function(account) {
-                    // After the login the language will be changed to
-                    // the language selected by the user during his registration
-                    if (account!== null) {
-                        $translate.use(account.langKey).then(function () {
-                            $translate.refresh();
-                        });
-                    }
                     deferred.resolve(data);
                 });
                 return cb();
@@ -45,7 +65,7 @@
         }
 
         function logout () {
-            AuthServerProvider.logout();
+            AuthSessionProvider.logout();
             Principal.authenticate(null);
         }
     }

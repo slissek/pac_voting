@@ -1,42 +1,15 @@
 <div>
-    <h3>Votes</h3>
-    <div class="row">
-        <div class="text-right">
-            <button class="btn btn-primary" ui-sref="home.new">
-                <span class="glyphicon glyphicon-plus"></span>
-                <span>Create a new Vote</span>
-            </button>
+    <div ng-switch="vm.isAuthenticated()">
+        <div class="alert alert-success" ng-switch-when="true">
+            You are logged in as user "{{vm.account.userName}}".
+        </div>
+
+        <div class="alert alert-warning" ng-switch-when="false">
+            You are currently not logged in<br />
+            If you want to <a class="alert-link" href="" ng-click="vm.login()">sign in</a>, you can try the default accounts:<br/>
+            - Administrator (username="admin" and password="admin") <br/>
+            - User (username="test" and password="test").
         </div>
     </div>
-    <div class="table-responsive">
-        <div id="votes" ng-repeat="vote in votes">
-            <h5>{{vote.topic}}</h5>
-            <div class="text-right">
-                <!-- TODO only if user is authenticated -->
-                <button class="btn" ui-sref="votes.edit({id:vote.id})">
-                    <span class="glyphicon glyphicon-edit"></span>
-                    <span>Edit Vote</span>
-                </button>
-            </div>
-            <table class="table">
-                <tr id="options" ng-repeat="option in vote.options">
-                    <td>
-                        <input name="{{vote.topic}}" type="radio" ng-model="option.userChoice" ng-value="true"
-                        ng-disabled="{{vote.userVoted==true}}" />
-                    </td>
-                    <td>{{option.text}}</td>
-                    <td>
-                        <div ng-if="vote.userVoted==true">{{option.percent}}%</div>
-                    </td>
-                </tr>
-            </table>
-            <!-- TODO only if user is authenticated -->
-            <div ng-if="vote.userVoted==false">
-                <button class="btn" ng-click="submitVote({id:vote.id})">
-                    <span class="glyphicon glyphicon-check"></span>
-                    <span>Submit Vote</span>
-                </button>
-            </div>
-        </div>
-    </div>
+    <div ui-view="votes" ng-cloak></div>
 </div>

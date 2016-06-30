@@ -4,9 +4,23 @@
 
     angular.module('VotingApp').controller('UserManagementDetailController', UserManagementDetailController);
 
-    UserManagementDetailController.$inject = ['$scope'];
+    UserManagementDetailController.$inject = ['$stateParams', 'User'];
 
-    function UserManagementDetailController($scope)
+    function UserManagementDetailController($stateParams, User)
     {
+        var vm = this;
+
+        vm.load = load;
+        vm.user = {};
+
+        vm.load($stateParams.id);
+
+        function load (id) {
+            User.get({id: id}, 
+                function(result) {
+                    vm.user = result;
+                }
+            );
+        }
     };
 })();

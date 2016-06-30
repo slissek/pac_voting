@@ -2,11 +2,11 @@
 {
     'use strict';
 
-    angular.module('VotingApp').factory('AuthServerProvider', AuthServerProvider);
+    angular.module('VotingApp').factory('AuthSessionProvider', AuthSessionProvider);
 
-    AuthServerProvider.$inject = ['$http', '$localStorage'];
+    AuthSessionProvider.$inject = ['$http', '$localStorage'];
 
-    function AuthServerProvider($http, $localStorage)
+    function AuthSessionProvider($http, $localStorage)
     {
         var service = {
             getToken: getToken,

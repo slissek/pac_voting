@@ -11,6 +11,9 @@
 # http://docs.spring.io/spring-boot/docs/current/reference/html/common-application-properties.html
 # ===================================================================
 
+management:
+    context-path: /management
+
 spring:
     application:
         name: slissek-pac
@@ -33,7 +36,22 @@ spring:
             hibernate.cache.use_minimal_puts: true
             hibernate.cache.hazelcast.use_lite_member: true
 
-# TODO: move to profile specific file
 server:
     port: 8080
     address: localhost
+
+security:
+    basic:
+        enabled: false
+    
+voting:
+    cache: # Hibernate 2nd level cache, used by CacheConfiguration
+        timeToLiveSeconds: 3600
+        hazelcast:
+            backupCount: 1
+    security:
+        rememberMe:
+            # security key (this key should be unique for your application, and kept secret)
+            key: 62bf4948d723ea2c8629193b87069d216ff898b3
+    metrics: # DropWizard Metrics configuration, used by MetricsConfiguration
+        jmx.enabled: true

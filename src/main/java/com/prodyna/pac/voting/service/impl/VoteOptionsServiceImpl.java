@@ -10,9 +10,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.prodyna.pac.voting.domain.Vote;
-import com.prodyna.pac.voting.domain.VoteOptions;
+import com.prodyna.pac.voting.domain.VoteOption;
 import com.prodyna.pac.voting.repository.VoteOptionsRepository;
 import com.prodyna.pac.voting.service.VoteOptionsService;
+import com.prodyna.pac.voting.web.rest.converter.VoteOptionConverter;
+import com.prodyna.pac.voting.web.rest.dto.VoteOptionDTO;
 
 /**
  * Service Implementation for managing VoteOptions.
@@ -34,10 +36,10 @@ public class VoteOptionsServiceImpl implements VoteOptionsService
      * @return the persisted entity
      */
     @Override
-    public VoteOptions save(final VoteOptions voteOptions)
+    public VoteOption save(final VoteOptionDTO voteOptionsDTO)
     {
-        this.log.debug("Request to save VoteOptions : {}", voteOptions);
-        final VoteOptions result = this.voteOptionsRepository.save(voteOptions);
+        this.log.debug("Request to save VoteOptions : {}", voteOptionsDTO);
+        final VoteOption result = this.voteOptionsRepository.save(VoteOptionConverter.toEntity(voteOptionsDTO));
         return result;
     }
 
@@ -48,10 +50,10 @@ public class VoteOptionsServiceImpl implements VoteOptionsService
      */
     @Override
     @Transactional(readOnly = true)
-    public List<VoteOptions> findAll()
+    public List<VoteOption> findAll()
     {
         this.log.debug("Request to get all VoteOptions");
-        final List<VoteOptions> result = this.voteOptionsRepository.findAll();
+        final List<VoteOption> result = this.voteOptionsRepository.findAll();
         return result;
     }
 
@@ -64,10 +66,10 @@ public class VoteOptionsServiceImpl implements VoteOptionsService
      */
     @Override
     @Transactional(readOnly = true)
-    public VoteOptions findOne(final Long id)
+    public VoteOption findOne(final Long id)
     {
         this.log.debug("Request to get VoteOptions : {}", id);
-        final VoteOptions voteOptions = this.voteOptionsRepository.findOne(id);
+        final VoteOption voteOptions = this.voteOptionsRepository.findOne(id);
         return voteOptions;
     }
 
@@ -81,7 +83,7 @@ public class VoteOptionsServiceImpl implements VoteOptionsService
     public void delete(final Long id)
     {
         this.log.debug("Request to delete VoteOptions : {}", id);
-        final VoteOptions voteOptions = this.voteOptionsRepository.findOne(id);
+        final VoteOption voteOptions = this.voteOptionsRepository.findOne(id);
         if (voteOptions != null)
         {
             this.voteOptionsRepository.delete(id);
@@ -98,10 +100,10 @@ public class VoteOptionsServiceImpl implements VoteOptionsService
      */
     @Override
     @Transactional(readOnly = true)
-    public List<VoteOptions> findAllByVote(final Vote vote)
+    public List<VoteOption> findAllByVote(final Vote vote)
     {
         this.log.debug("Request to get all VoteOptions relates to vote: {}", vote);
-        final List<VoteOptions> voteOptionsByVote = this.voteOptionsRepository.findAllByVote(vote);
+        final List<VoteOption> voteOptionsByVote = this.voteOptionsRepository.findAllByVote(vote);
         return voteOptionsByVote;
     }
 }

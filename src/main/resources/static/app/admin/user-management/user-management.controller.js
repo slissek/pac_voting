@@ -4,30 +4,30 @@
 
     angular.module('VotingApp').controller('UserManagementController', UserManagementController);
 
-    UserManagementController.$inject = ['$scope'];
+    UserManagementController.$inject = [ 'Principal', 'User' ];
 
-    function UserManagementController($scope)
+    function UserManagementController(Principal, User)
     {
-        $scope.users = [
+        var vm = this;
+        vm.authorities = [ 'ROLE_USER', 'ROLE_ADMIN' ];
+        vm.currentAccount = null;
+        vm.loadAll = loadAll;
+        vm.totalItems = null;
+        vm.users = [];
+
+        vm.loadAll();
+
+        Principal.identity().then(function(account) {
+            vm.currentAccount = account;
+        });
+
+        function loadAll()
         {
-            "id" : "1",
-            "username" : "admin",
-            "firstname" : "",
-            "lastname" : "",
-            "authorities" : [
-             {
-                 "name" : "ADMINISTRATOR"
-             }]
-        },
-        {
-            "id" : "2",
-            "username" : "user",
-            "firstname" : "test",
-            "lastname" : "user",
-            "authorities" : [
-             {
-                 "name" : "USER"
-             }]
-        }]
-    };
+            User.query(
+               function (result, headers) {
+                   vm.totalItems = headers('X-Total-Count');
+                   vm.users = result;
+               });
+        }
+    }
 })();

@@ -27,6 +27,7 @@ import com.prodyna.pac.voting.domain.User;
 import com.prodyna.pac.voting.repository.AuthorityRepository;
 import com.prodyna.pac.voting.security.AuthoritiesConstants;
 import com.prodyna.pac.voting.service.UserService;
+import com.prodyna.pac.voting.web.rest.converter.UserConverter;
 import com.prodyna.pac.voting.web.rest.dto.ManagedUserDTO;
 import com.prodyna.pac.voting.web.rest.util.HeaderUtil;
 
@@ -59,7 +60,7 @@ public class UserResource
     @RequestMapping(value = "/users", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     // @Timed
     @Secured(AuthoritiesConstants.ADMIN)
-    public ResponseEntity<?> createUser(@RequestBody final ManagedUserDTO userDTO) throws URISyntaxException
+    public ResponseEntity<ManagedUserDTO> createUser(@RequestBody final ManagedUserDTO userDTO) throws URISyntaxException
     {
         this.log.debug("REST request to save User : {}", userDTO);
 
@@ -76,7 +77,7 @@ public class UserResource
         }
         else
         {
-            final User newUser = this.userService.save(userDTO);
+            final ManagedUserDTO newUser = UserConverter.toDto(this.userService.save(userDTO));
             return ResponseEntity.created(new URI("/api/users/" + newUser.getId()))
                     .headers(HeaderUtil.createEntityCreationAlert("userManagement", newUser.getId().toString())).body(newUser);
         }
@@ -120,7 +121,7 @@ public class UserResource
             userDTO.getAuthorities().stream().forEach(authority -> authorities.add(this.authorityRepository.findOne(authority)));
 
             return ResponseEntity.ok().headers(HeaderUtil.createAlert("userManagement.updated", userDTO.getUserName()))
-                    .body(new ManagedUserDTO(this.userService.getUserById(userDTO.getId())));
+                    .body(UserConverter.toDto(this.userService.getUserById(userDTO.getId())));
         }
         else
         {
@@ -144,9 +145,9 @@ public class UserResource
         final List<ManagedUserDTO> userDTOs = new ArrayList<ManagedUserDTO>();
         for (final User user : userList)
         {
-            userDTOs.add(new ManagedUserDTO(user));
+            userDTOs.add(UserConverter.toDto(user));
         }
-        return new ResponseEntity<>(userDTOs, HttpStatus.OK);
+        return new ResponseEntity<List<ManagedUserDTO>>(userDTOs, HttpStatus.OK);
     }
 
     /**
@@ -166,7 +167,7 @@ public class UserResource
 
         if (userById != null)
         {
-            final ManagedUserDTO userDTO = new ManagedUserDTO(userById);
+            final ManagedUserDTO userDTO = UserConverter.toDto(userById);
             return new ResponseEntity<>(userDTO, HttpStatus.OK);
         }
         else

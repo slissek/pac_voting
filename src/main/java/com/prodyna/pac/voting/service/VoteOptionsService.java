@@ -3,7 +3,8 @@ package com.prodyna.pac.voting.service;
 import java.util.List;
 
 import com.prodyna.pac.voting.domain.Vote;
-import com.prodyna.pac.voting.domain.VoteOptions;
+import com.prodyna.pac.voting.domain.VoteOption;
+import com.prodyna.pac.voting.web.rest.dto.VoteOptionDTO;
 
 /**
  * Service Interface for managing VoteOptions.
@@ -18,14 +19,14 @@ public interface VoteOptionsService
      *            the entity to save
      * @return the persisted entity
      */
-    VoteOptions save(VoteOptions voteOptions);
+    VoteOption save(VoteOptionDTO voteOptions);
 
     /**
      * Get all the voteOptions.
      *
      * @return the list of entities
      */
-    List<VoteOptions> findAll();
+    List<VoteOption> findAll();
 
     /**
      * Get all the voteOptions.
@@ -34,7 +35,7 @@ public interface VoteOptionsService
      *            the vote the options relates to
      * @return the list of entities
      */
-    List<VoteOptions> findAllByVote(Vote vote);
+    List<VoteOption> findAllByVote(Vote vote);
 
     /**
      * Get the "id" voteOptions.
@@ -43,7 +44,7 @@ public interface VoteOptionsService
      *            the id of the entity
      * @return the entity
      */
-    <Optional>VoteOptions findOne(Long id);
+    <Optional>VoteOption findOne(Long id);
 
     /**
      * Delete the "id" voteOptions.

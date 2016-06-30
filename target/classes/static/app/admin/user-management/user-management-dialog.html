@@ -1,7 +1,7 @@
 <form name="editForm" role="form" novalidate ng-submit="vm.save()" show-validation>
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true" ng-click="vm.clear()">&times;</button>
-        <h4 class="modal-title" id="myUserLabel">Create a User</h4>
+        <h4 class="modal-title">Create a User</h4>
     </div>
     <div class="modal-body">
         <div class="form-group">
@@ -11,14 +11,14 @@
 
         <div class="form-group">
             <label class="control-label">Username</label>
-            <input type="text" class="form-control" name="username" ng-model="vm.user.username" 
-                ng-required="vm.user.username == null" ng-minlength=1 ng-maxlength=50 /">
+            <input type="text" class="form-control" name="userName" ng-model="vm.user.userName" 
+                ng-required="vm.user.userName == null" ng-minlength=1 ng-maxlength=50 /">
 
-            <div ng-show="editForm.username.$invalid">
-                <p class="help-block" ng-show="editForm.username.$error.required">
+            <div ng-show="editForm.userName.$invalid">
+                <p class="help-block" ng-show="editForm.userName.$error.required">
                     This field is required.
                 </p>
-                <p class="help-block" ng-show="editForm.username.$error.maxlength">
+                <p class="help-block" ng-show="editForm.userName.$error.maxlength">
                     This field cannot be longer than 50 characters.
                 </p>
             </div>
@@ -26,10 +26,10 @@
 
         <div class="form-group">
             <label class="control-label">First Name</label>
-            <input type="text" class="form-control" name="firstname" ng-model="vm.user.firstname" ng-maxlength="50">
+            <input type="text" class="form-control" name="firstName" ng-model="vm.user.firstName" ng-maxlength="50">
 
-            <div ng-show="editForm.firstname.$invalid">
-                <p class="help-block" ng-show="editForm.firstname.$error.maxlength">
+            <div ng-show="editForm.firstName.$invalid">
+                <p class="help-block" ng-show="editForm.firstName.$error.maxlength">
                     This field cannot be longer than 50 characters.
                 </p>
             </div>
@@ -37,17 +37,32 @@
 
         <div class="form-group">
             <label class="control-label">Last Name</label>
-            <input type="text" class="form-control" name="lastname" ng-model="vm.user.lastname" ng-maxlength="50">
+            <input type="text" class="form-control" name="lastName" ng-model="vm.user.lastName" ng-maxlength="50">
 
-            <div ng-show="editForm.lastname.$invalid">
-                <p class="help-block" ng-show="editForm.lastname.$error.maxlength">
+            <div ng-show="editForm.lastName.$invalid">
+                <p class="help-block" ng-show="editForm.lastName.$error.maxlength">
                     This field cannot be longer than 50 characters.
                 </p>
             </div>
         </div>
 
+        <div ng-if="vm.user.id==undefined">
+            <label class="control-label">Password</label>
+            <input type="password" class="form-control" id="password" name="password" ng-model="vm.user.password" 
+                ng-model-options="{allowInvalid: true}" ng-pattern="/^(?=.*[A-Za-z])(?=.*\d)(?=.*[$@$!%*#?&])[A-Za-z\d$@$!%*#?&]{4,50}$/" required>
+            <div ng-show="editForm.password.$dirty && editForm.password.$invalid">
+                <p class="help-block" ng-show="editForm.password.$error.required">
+                   Password is required.
+                </p>
+                <p class="help-block" ng-show="editForm.password.$error.pattern">
+                    The password must contain at least one: special character, digit and capital letter and length between 4 to 50 characters.
+                </p>
+            </div>
+            <password-strength ng-model="vm.user.password"></password-strength>
+        </div>
+
         <div class="form-group">
-            <label translate="userManagement.profiles">Profiles</label>
+            <label class="control-label">Profiles</label>
             <select class="form-control" multiple name="authority" ng-model="vm.user.authorities"
                     ng-options="authority for authority in vm.authorities">
             </select>

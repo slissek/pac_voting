@@ -59,7 +59,7 @@ public class UserVotings implements Serializable
      * @param voteId
      *            the id of the {@link Vote}
      * @param voteOptionsId
-     *            the id of the {@link VoteOptions}
+     *            the id of the {@link VoteOption}
      */
     public UserVotings(final long userId, final long voteId, final long voteOptionsId)
     {

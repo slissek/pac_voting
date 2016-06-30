@@ -4,21 +4,19 @@
 
     angular.module('VotingApp').controller('LogoutController', LogoutController);
     
-    LogoutController.$inject = ['$scope', '$uibModalInstance'];
+    LogoutController.$inject = ['$scope', '$uibModalInstance', '$state', 'Auth'];
 
-    function LogoutController($scope, $uibModalInstance)
+    function LogoutController($scope, $uibModalInstance, $state, Auth)
     {
         var vm = this;
-        vm.username = null;
-        vm.password = null;
-        vm.rememberMe = true;
         vm.logout = logout;
         vm.cancel = cancel;
 
         function logout()
         {
-            //TODO logout
+            Auth.logout();
             $uibModalInstance.close();
+            $state.go('home');
         };
 
         function cancel()

@@ -19,6 +19,7 @@ import org.springframework.security.web.authentication.rememberme.AbstractRememb
 import org.springframework.security.web.authentication.rememberme.CookieTheftException;
 import org.springframework.security.web.authentication.rememberme.InvalidCookieException;
 import org.springframework.security.web.authentication.rememberme.RememberMeAuthenticationException;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.prodyna.pac.voting.config.ApplicationProperties;
@@ -49,6 +50,7 @@ import com.prodyna.pac.voting.repository.UserRepository;
  * <p>
  * The main algorithm comes from Spring Security's PersistentTokenBasedRememberMeServices, but this class couldn't be cleanly extended.
  */
+@Service
 public class CustomPersistentRememberMeServices extends AbstractRememberMeServices
 {
 
