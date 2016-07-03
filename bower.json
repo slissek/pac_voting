@@ -1,7 +1,7 @@
 {
     "version": "0.0.0",
     "name": "Voting-App",
-    "appPath": "src/main/resources/static",
+    "appPath": "/src/main/resources/static",
     "dependencies": {
         "angular": "1.5.2",
         "angular-cookies": "1.5.2",
