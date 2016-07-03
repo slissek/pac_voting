@@ -1,37 +1,27 @@
 package com.prodyna.pac.voting.web.rest.dto;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import com.prodyna.pac.voting.domain.VoteOption;
-import com.prodyna.pac.voting.web.rest.converter.VoteOptionConverter;
-
 public class VoteDTO
 {
-    private final Long id;
+    private Long id;
 
     @NotNull
-    private final Long userId;
+    private Long userId;
 
     @NotNull
     @Size(min = 1, max = 200)
-    private final String topic;
+    private String topic;
 
-    private List<VoteOptionDTO> options;
+    private boolean userVoted;
 
-    public VoteDTO(final Long id, final Long userId, final String topic, final Set<VoteOption> voteOptions){
-        this.id = id;
-        this.userId = userId;
-        this.topic = topic;
-        final Set<VoteOptionDTO> options = new HashSet<VoteOptionDTO>(voteOptions.size());
-        for (final VoteOption voteOption : voteOptions)
-        {
-            options.add(VoteOptionConverter.toDto(voteOption));
-        }
+    private List<VoteOptionDTO> voteOptions;
+
+    public VoteDTO()
+    {
     }
 
     /**
@@ -43,11 +33,27 @@ public class VoteDTO
     }
 
     /**
+     * @param id the id to set
+     */
+    public void setId(final Long id)
+    {
+        this.id = id;
+    }
+
+    /**
      * @return the userId
      */
     public Long getUserId()
     {
         return this.userId;
+    }
+
+    /**
+     * @param userId the userId to set
+     */
+    public void setUserId(final Long userId)
+    {
+        this.userId = userId;
     }
 
     /**
@@ -59,10 +65,42 @@ public class VoteDTO
     }
 
     /**
-     * @return the options
+     * @param topic the topic to set
      */
-    public List<VoteOptionDTO> getOptions()
+    public void setTopic(final String topic)
     {
-        return this.options;
+        this.topic = topic;
+    }
+
+    /**
+     * @return the userVoted
+     */
+    public boolean isUserVoted()
+    {
+        return this.userVoted;
+    }
+
+    /**
+     * @param userVoted the userVoted to set
+     */
+    public void setUserVoted(final boolean userVoted)
+    {
+        this.userVoted = userVoted;
+    }
+
+    /**
+     * @return the voteOptions
+     */
+    public List<VoteOptionDTO> getVoteOptions()
+    {
+        return this.voteOptions;
+    }
+
+    /**
+     * @param voteOptions the voteOptions to set
+     */
+    public void setVoteOptions(final List<VoteOptionDTO> voteOptions)
+    {
+        this.voteOptions = voteOptions;
     }
 }

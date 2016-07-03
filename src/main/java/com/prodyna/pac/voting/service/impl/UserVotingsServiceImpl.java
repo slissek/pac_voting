@@ -87,4 +87,44 @@ public class UserVotingsServiceImpl implements UserVotingsService
             this.log.debug("User voting deleted: {}", userVoting);
         }
     }
+
+    @Override
+    public List<UserVotings> findByUserId(final Long userId)
+    {
+        this.log.debug("Request to get UserVotings by userID: {}", userId);
+        final List<UserVotings> userVotings = this.userVotingsRepository.findByUserId(userId);
+        return userVotings;
+    }
+
+    @Override
+    public List<UserVotings> findByVoteId(final Long voteId)
+    {
+        this.log.debug("Request to get UserVotings by voteID: {}", voteId);
+        final List<UserVotings> userVotings = this.userVotingsRepository.findByVoteId(voteId);
+        return userVotings;
+    }
+
+    @Override
+    public List<UserVotings> findByUserIdAndVoteId(final Long userId, final Long voteId)
+    {
+        this.log.debug("Request to get UserVotings by userId and voteID: {}", userId, voteId);
+        final List<UserVotings> userVotings = this.userVotingsRepository.findByUserIdAndVoteId(userId, voteId);
+        return userVotings;
+    }
+
+    @Override
+    public Long getCountForVoteId(final Long voteId)
+    {
+        this.log.debug("Request to get count by voteID: {}", voteId);
+        final Long countByVoteId = this.userVotingsRepository.countByVoteId(voteId);
+        return countByVoteId;
+    }
+
+    @Override
+    public Long getCountForVoteIdAndOption(final Long voteId, final Long voteOptionsId)
+    {
+        this.log.debug("Request to get count by voteID and voteOptionsId: {}", voteId, voteOptionsId);
+        final Long countByVoteId = this.userVotingsRepository.countByVoteIdAndVoteOptionsId(voteId, voteOptionsId);
+        return countByVoteId;
+    }
 }

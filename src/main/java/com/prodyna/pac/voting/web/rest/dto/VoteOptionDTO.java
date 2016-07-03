@@ -5,21 +5,20 @@ import javax.validation.constraints.Size;
 
 public class VoteOptionDTO
 {
-    private final Long id;
+    private Long id;
+
+    private Long voteId;
 
     @NotNull
     @Size(max = 100)
-    private final String text;
+    private String text;
 
     private float percent;
 
     private boolean userChoice = false;
 
-    public VoteOptionDTO(final Long id, final String text, final float percent)
+    public VoteOptionDTO()
     {
-        this.id = id;
-        this.text = text;
-        this.percent = percent;
     }
 
     /**
@@ -31,11 +30,46 @@ public class VoteOptionDTO
     }
 
     /**
+     * @param id
+     *            the id to set
+     */
+    public void setId(final Long id)
+    {
+        this.id = id;
+    }
+
+    /**
+     * @return the voteId
+     */
+    public Long getVoteId()
+    {
+        return this.voteId;
+    }
+
+    /**
+     * @param voteId
+     *            the voteId to set
+     */
+    public void setVoteId(final Long voteId)
+    {
+        this.voteId = voteId;
+    }
+
+    /**
      * @return the text
      */
     public String getText()
     {
         return this.text;
+    }
+
+    /**
+     * @param text
+     *            the text to set
+     */
+    public void setText(final String text)
+    {
+        this.text = text;
     }
 
     /**
@@ -47,7 +81,8 @@ public class VoteOptionDTO
     }
 
     /**
-     * @param percent the percent to set
+     * @param percent
+     *            the percent to set
      */
     public void setPercent(final float percent)
     {
@@ -63,11 +98,11 @@ public class VoteOptionDTO
     }
 
     /**
-     * @param userChoice the userChoice to set
+     * @param userChoice
+     *            the userChoice to set
      */
     public void setUserChoice(final boolean userChoice)
     {
         this.userChoice = userChoice;
     }
-
 }

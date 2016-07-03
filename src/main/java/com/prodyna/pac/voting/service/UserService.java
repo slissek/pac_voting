@@ -3,7 +3,6 @@ package com.prodyna.pac.voting.service;
 import java.util.List;
 
 import com.prodyna.pac.voting.domain.User;
-import com.prodyna.pac.voting.web.rest.dto.ManagedUserDTO;
 
 /**
  * Service Interface for managing Users.
@@ -17,7 +16,7 @@ public interface UserService
      *            the entity to save
      * @return the persisted entity
      */
-    User save(ManagedUserDTO userDTO);
+    User save(User user);
 
     /**
      * Get all the users.

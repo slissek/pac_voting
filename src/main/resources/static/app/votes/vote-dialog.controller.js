@@ -4,57 +4,64 @@
 
     angular.module('VotingApp').controller('VoteDialogController', VoteDialogController);
 
-    VoteDialogController.$inject = ['$scope', '$state', '$uibModalInstance'];
+    VoteDialogController.$inject = ['$uibModalInstance', 'Principal', 'Votes', 'entity'];
 
-    function VoteDialogController($scope, $state, $uibModalInstance)
+    function VoteDialogController($uibModalInstance, Principal, Votes, entity)
     {
         var vm = this;
 
-        vm.votes = [];
-        vm.voteOption = {
-            options : [],
-            newOption : {text:''}
-        };
         vm.addVoteOption = addVoteOption;
+        vm.clear = clear;
+        vm.currentAccount = null;
         vm.deleteVoteOption = deleteVoteOption;
-        vm.saveVote = saveVote;
-        vm.cancel = cancel;
+        vm.save = save;
+        vm.vote = entity;
+        vm.voteOption = {
+                newOption : {id: null, text:''}
+        };
 
-        function getAllVotes() {
-            $http.get('api/votes');
-        }
+        Principal.identity().then(function(account) {
+            vm.currentAccount = account;
+            vm.vote.userId = vm.currentAccount.id;
+        });
 
         function addVoteOption() {
-            vm.voteOption.options.push(vm.voteOption.newOption);
-            vm.voteOption.newOption = {text:''}
+            vm.vote.voteOptions.push(vm.voteOption.newOption);
+            vm.voteOption.newOption = {id: null, text:''}
         }
 
-        function deleteVoteOption(option)
-        {
-            vm.voteOption.options.splice(vm.voteOption.options.indexOf(option), 1);
-            vm.voteOption.newOption = {text:''}
-        }
-
-        function saveVote()
-        {
-            var data = {
-                topic : vm.vote.topic,
-                options : vm.voteOption.options
-            };
-
-            $http.post('api/votes', data).success(function (response) {
-                $uibModalInstance.close();
-                return response;
-            });
-        }
-
-        function cancel()
+        function clear()
         {
             vm.voteOption = {
-                options : [],
                 newOption : {text:''}
             };
             $uibModalInstance.dismiss('cancel');
         }
-    };
+
+        function deleteVoteOption(option)
+        {
+            if (vm.vote.voteOptions.length > 0) {
+                vm.vote.voteOptions.splice(vm.vote.voteOptions.indexOf(option), 1);
+            }
+            vm.voteOption.newOption = {id: null, text:''}
+        }
+
+        function onSaveSuccess (result) {
+            vm.isSaving = false;
+            $uibModalInstance.close(result);
+        }
+
+        function onSaveError () {
+            vm.isSaving = false;
+        }
+
+        function save()
+        {
+            if (vm.vote.id !== null) {
+                Votes.update(vm.vote, onSaveSuccess, onSaveError);
+            } else {
+                Votes.save(vm.vote, onSaveSuccess, onSaveError);
+            }
+        }
+    }
 })();

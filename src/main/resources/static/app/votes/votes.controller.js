@@ -4,70 +4,55 @@
 
     angular.module('VotingApp').controller('VotesController', VotesController);
     
-    VotesController.$inject = ['$scope', 'Votes'];
+    VotesController.$inject = ['Principal', 'Votes', 'UserVotes'];
 
-    function VotesController($scope, Votes)
+    function VotesController(Principal, Votes, UserVotes)
     {
-        $scope.votes = [
-        {
-            "id" : "1",
-            "topic" : "What is you favorite operating system?",
-            "userVoted" : false,
-            "options" : [
-            {
-                "id" : "1",
-                "text" : "Windows",
-                "percent" : "4,3",
-                "userChoice" : false
-            },
-            {
-                "id" : "2",
-                "text" : "Linux",
-                "percent" : "18,7",
-                "userChoice" : false 
-            },
-            {
-                "id" : "3",
-                "text" : "macOS",
-                "percent" : "34,9",
-                "userChoice" : false
-            },
-            {
-                "id" : "4",
-                "text" : "other",
-                "percent" : "42,1",
-                "userChoice" : false
-            }]
-        },
-        {
-            "id" : "2",
-            "topic" : "What is you favorite pet?",
-            "userVoted" : true,
-            "options" : [
-            {
-                "id" : "1",
-                "text" : "Cat",
-                "percent" : "4,3",
-                "userChoice" : false
-            },
-            {
-                "id" : "2",
-                "text" : "Dog",
-                "percent" : "18,7",
-                "userChoice" : false
-            },
-            {
-                "id" : "3",
-                "text" : "Rabbit",
-                "percent" : "34,9",
-                "userChoice" : false
-            },
-            {
-                "id" : "4",
-                "text" : "Fish",
-                "percent" : "42,1",
-                "userChoice" : true
-            }]
-        }];
+        var vm = this;
+        vm.currentAccount = null;
+        vm.isAuthenticated = Principal.isAuthenticated;
+        vm.isAdmin = Principal.hasAuthority("ROLE_ADMIN")
+        vm.loadAll = loadAll;
+        vm.save = save;
+        vm.userVote = {};
+        vm.votes = [];
+
+        vm.loadAll();
+
+        Principal.identity().then(function(account) {
+            vm.currentAccount = account;
+            if (vm.currentAccount !== null) {
+                vm.userVote.userId = vm.currentAccount.id;
+            }
+        });
+
+        function loadAll() {
+            Votes.query(
+                function (result, headers) {
+//                    vm.totalItems = headers('X-Total-Count');
+                    vm.votes = result;
+                }
+            );
+        }
+
+        function onSaveSuccess (result) {
+            vm.loadAll();
+        }
+
+        function onSaveError () {
+        }
+
+        function save(vote) {
+            vm.userVote.voteId = vote.id;
+            for (var i=0; i<vote.options.length; i++) {
+                var voteOptions = vote.options[i];
+                if (voteOptions.userChoice) {
+                    vm.userVote.voteOptionsId = voteOptions.id;
+                    break;
+                }
+            }
+            
+            UserVotes.save(vm.userVote, onSaveSuccess, onSaveError);
+        }
     }
 })();

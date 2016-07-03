@@ -5,33 +5,75 @@
     </div>
     <div class="modal-body">
         <div class="form-group">
-            <label class="control-label">Vote Topic</label>
-            <input type="text" class="form-control" name="voteTopic" ng-model="vm.vote.topic" 
-                ng-required="vm.vote.topic == null"/>
+            <input type="text" class="form-control hidden" name="id" ng-model="vm.vote.id" readonly>
+        </div>
 
+        <div class="form-group">
+            <input type="text" class="form-control hidden" name="userId" ng-model="vm.vote.userId" readonly>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label">Vote Topic</label>
+            <input type="text" class="form-control" name="voteTopic" ng-model="vm.vote.topic" ng-minlength=4 ng-maxlength=200 required />
             <div ng-show="voteEditForm.voteTopic.$invalid">
                 <p class="help-block" ng-show="voteEditForm.voteTopic.$error.required">
                     This field is required.
+                </p>
+                <p class="help-block" ng-show="voteEditForm.voteTopic.$error.minlength">
+                    The topic must be at least 4 characters long.
+                </p>
+                <p class="help-block" ng-show="voteEditForm.voteTopic.$error.maxlength">
+                    The topic cannot be longer than 200 characters.
                 </p>
             </div>
         </div>
 
         <div class="form-group">
             <label class="control-label">Vote Options</label>
-            <div id="options" ng-repeat="option in vm.voteOption.options">
-                <input type="text" class="form-control" name="voteOption" ng-model="option.text" ng-change="vm.change()" />
-                <button class="btn" ng-click="vm.deleteVoteOption(option)">Delete</button>
+            <div id="options" ng-repeat="option in vm.vote.voteOptions" ng-class="{ 'has-error' : voteOptionForm.voteOption.$invalid }">
+                <ng-form name="voteOptionForm">
+                    <div class="form-group">
+                        <input type="text" class="form-control hidden" name="id" ng-model="option.id" readonly>
+                    </div>
+                    <input type="text" class="form-control" name="voteOption" ng-model="option.text" ng-minlength=1 ng-maxlength=100 required />
+                    <div ng-show="voteOptionForm.voteOption.$invalid">
+                        <p class="help-block" ng-show="voteOptionForm.voteOption.$error.required">
+                            This field is required.
+                        </p>
+                        <p class="help-block" ng-show="oteOptionForm.voteOption.$error.minlength">
+                            The vote option must be at least 1 character long.
+                        </p>
+                        <p class="help-block" ng-show="foteOptionForm.voteOption.$error.maxlength">
+                            The vote option cannot be longer than 100 characters.
+                        </p>
+                    </div>
+                    <button type="button" class="btn btn-danger text-right" ng-click="vm.deleteVoteOption(option)">
+                        <span class="glyphicon glyphicon-remove-circle"></span>&nbsp;
+                        <span>Delete</span>
+                    </button>
+                </ng-form>
             </div>
             <div>
-                <input type="text" class="form-control" name="newOption" ng-model="vm.voteOption.newOption.text" />
-                <button class="btn" ng-click="vm.addVoteOption()">Add Vote Option</button>
+                <input type="text" class="form-control" name="newOption" ng-model="vm.voteOption.newOption.text" ng-minlength=1 ng-maxlength=100 />
+                <div ng-show="voteEditForm.newOption.$invalid">
+                    <p class="help-block" ng-show="form.password.$error.minlength">
+                        The vote option must be at least 1 character long.
+                    </p>
+                    <p class="help-block" ng-show="form.password.$error.maxlength">
+                        The vote option cannot be longer than 100 characters.
+                    </p>
+                </div>
+                <button type="button" class="btn btn-primary" ng-click="vm.addVoteOption()">
+                    <span class="glyphicon glyphicon-plus-sign"></span>&nbsp;
+                    <span>Add Vote Option</span>
+                </button>
             </div>
         </div>
     </div>
     <div class="modal-footer">
-        <button type="submit" ng-disabled="editForm.$invalid || isSaving" class="btn btn-primary">
+        <button type="submit" ng-disabled="voteEditForm.$invalid" class="btn btn-primary">
             <span class="glyphicon glyphicon-save"></span>&nbsp;
-            <span>Create</span>
+            <span>Save</span>
         </button>
         <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="vm.clear()">
             <span class="glyphicon glyphicon-ban-circle"></span>&nbsp;

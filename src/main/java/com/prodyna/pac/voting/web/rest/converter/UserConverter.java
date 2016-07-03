@@ -1,6 +1,8 @@
 package com.prodyna.pac.voting.web.rest.converter;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -33,5 +35,12 @@ public class UserConverter
     {
         return new ManagedUserDTO(user.getId(), user.getUserName(), user.getFirstName(), user.getLastName(), user.getPassword(),
                 user.getAuthorities().stream().map(Authority::getName).collect(Collectors.toSet()));
+    }
+
+    public static List<ManagedUserDTO> toDtoList(final List<User> users)
+    {
+        final List<ManagedUserDTO> result = new ArrayList<ManagedUserDTO>(users.size());
+        users.stream().forEach(user -> result.add(UserConverter.toDto(user)));
+        return result;
     }
 }

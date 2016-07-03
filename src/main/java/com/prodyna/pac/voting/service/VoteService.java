@@ -3,7 +3,6 @@ package com.prodyna.pac.voting.service;
 import java.util.List;
 
 import com.prodyna.pac.voting.domain.Vote;
-import com.prodyna.pac.voting.web.rest.dto.VoteDTO;
 
 /**
  * Service Interface for managing Vote.
@@ -16,7 +15,7 @@ public interface VoteService {
      * @param vote the entity to save
      * @return the persisted entity
      */
-    Vote save(VoteDTO voteDto);
+    Vote save(Vote vote);
 
     /**
      *  Get all the votes.

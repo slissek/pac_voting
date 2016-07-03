@@ -68,7 +68,7 @@
                     resolve: {
                         entity: function () {
                             return {
-                                // TODO
+                                id: null, userId: null, topic: null, options: []
                             };
                         }
                     }
@@ -78,6 +78,55 @@
                     $state.go('home');
                 });
             }],
+        })
+
+        .state('home.edit',
+        {
+            parent : 'home',
+            url : '/{id}/edit',
+            onEnter: ['$stateParams', '$state', '$uibModal', function($stateParams, $state, $uibModal) {
+                $uibModal.open({
+                    templateUrl: 'app/votes/vote-dialog.html',
+                    controller: 'VoteDialogController',
+                    controllerAs: 'vm',
+                    backdrop: 'static',
+                    size: 'lg',
+                    resolve: {
+                        entity: ['Votes', function(Votes) {
+                            return Votes.get({id : $stateParams.id});
+                        }]
+                    }
+                }).result.then(function() {
+                    $state.go('home', null, { reload: true });
+                }, function() {
+                    $state.go('home');
+                });
+            }],
+        })
+
+        .state('home.delete', {
+            parent: 'home',
+            url: '/{id}/delete',
+            data: {
+                authorities: ['ROLE_ADMIN']
+            },
+            onEnter: ['$stateParams', '$state', '$uibModal', function($stateParams, $state, $uibModal) {
+                $uibModal.open({
+                    templateUrl: 'app/votes/vote-delete-dialog.html',
+                    controller: 'VoteDeleteController',
+                    controllerAs: 'vm',
+                    size: 'sm',
+                    resolve: {
+                        entity: ['Votes', function(Votes) {
+                            return Votes.get({id : $stateParams.id});
+                        }]
+                    }
+                }).result.then(function() {
+                    $state.go('home', null, { reload: true });
+                }, function() {
+                    $state.go('^');
+                });
+            }]
         })
 
         // ADMINISTRATION
@@ -115,7 +164,7 @@
                     resolve: {
                         entity: function () {
                             return {
-                                id: null, username: null, firstName: null, lastName: null, authorities: null
+                                id: null, userName: null, firstName: null, lastName: null, authorities: null
                             };
                         }
                     }

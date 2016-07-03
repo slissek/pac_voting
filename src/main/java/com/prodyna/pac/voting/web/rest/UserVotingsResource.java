@@ -21,6 +21,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.prodyna.pac.voting.domain.UserVotings;
 import com.prodyna.pac.voting.service.UserVotingsService;
+import com.prodyna.pac.voting.web.rest.converter.UserVotingsConverter;
+import com.prodyna.pac.voting.web.rest.dto.UserVotingsDTO;
 import com.prodyna.pac.voting.web.rest.util.HeaderUtil;
 
 /**
@@ -28,7 +30,8 @@ import com.prodyna.pac.voting.web.rest.util.HeaderUtil;
  */
 @RestController
 @RequestMapping("/api")
-public class UserVotingsResource {
+public class UserVotingsResource
+{
 
     private final Logger log = LoggerFactory.getLogger(UserVotingsResource.class);
 
@@ -36,76 +39,94 @@ public class UserVotingsResource {
     private UserVotingsService userVotingsService;
 
     /**
-     * POST  /user-votings : Create a new userVotings.
+     * POST /user-votings : Create a new userVotings.
      *
-     * @param userVotings the userVotings to create
-     * @return the ResponseEntity with status 201 (Created) and with body the new userVotings, or with status 400 (Bad Request) if the userVotings has already an ID
-     * @throws URISyntaxException if the Location URI syntax is incorrect
+     * @param userVotings
+     *            the userVotings to create
+     * @return the ResponseEntity with status 201 (Created) and with body the new userVotings, or with status 400 (Bad Request) if the
+     *         userVotings has already an ID
+     * @throws URISyntaxException
+     *             if the Location URI syntax is incorrect
      */
-    @RequestMapping(value = "/user-votings",
-            method = RequestMethod.POST,
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    //    @Timed
-    public ResponseEntity<UserVotings> createUserVotings(@Valid @RequestBody final UserVotings userVotings) throws URISyntaxException {
-        this.log.debug("REST request to save UserVotings : {}", userVotings);
-        if (userVotings.getId() != null) {
-            return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("userVotings", "idexists", "A new userVotings cannot already have an ID")).body(null);
+    @RequestMapping(value = "/user-votings", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    // @Timed
+    public ResponseEntity<UserVotingsDTO> createUserVotings(@Valid @RequestBody final UserVotingsDTO userVotingsDTO)
+            throws URISyntaxException
+    {
+        this.log.debug("REST request to save UserVotings : {}", userVotingsDTO);
+        if (userVotingsDTO.getId() != null)
+        {
+            return ResponseEntity.badRequest()
+                    .headers(HeaderUtil.createFailureAlert("userVotings", "idexists", "A new userVotings cannot already have an ID"))
+                    .body(null);
         }
-        final UserVotings result = this.userVotingsService.save(userVotings);
+        // Check if user already voted
+        final List<UserVotings> findByUserIdAndVoteId = this.userVotingsService.findByUserIdAndVoteId(userVotingsDTO.getUserId(), userVotingsDTO.getVoteId());
+        if ((findByUserIdAndVoteId != null) && (findByUserIdAndVoteId.size() != 0))
+        {
+            return ResponseEntity.badRequest()
+                    .headers(HeaderUtil.createFailureAlert("userVotings", "useralreadyvoted", "The user already voted this vote"))
+                    .body(null);
+        }
+
+        final UserVotings userVotings = UserVotingsConverter.toEntity(userVotingsDTO);
+        final UserVotingsDTO result = UserVotingsConverter.toDto(this.userVotingsService.save(userVotings));
         return ResponseEntity.created(new URI("/api/user-votings/" + result.getId()))
                 .headers(HeaderUtil.createEntityCreationAlert("userVotings", result.getId().toString()))
                 .body(result);
     }
 
     /**
-     * PUT  /user-votings : Updates an existing userVotings.
+     * PUT /user-votings : Updates an existing userVotings.
      *
-     * @param userVotings the userVotings to update
-     * @return the ResponseEntity with status 200 (OK) and with body the updated userVotings,
-     * or with status 400 (Bad Request) if the userVotings is not valid,
-     * or with status 500 (Internal Server Error) if the userVotings couldnt be updated
-     * @throws URISyntaxException if the Location URI syntax is incorrect
+     * @param userVotings
+     *            the userVotings to update
+     * @return the ResponseEntity with status 200 (OK) and with body the updated userVotings, or with status 400 (Bad Request) if the
+     *         userVotings is not valid, or with status 500 (Internal Server Error) if the userVotings couldnt be updated
+     * @throws URISyntaxException
+     *             if the Location URI syntax is incorrect
      */
-    @RequestMapping(value = "/user-votings",
-            method = RequestMethod.PUT,
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    //    @Timed
-    public ResponseEntity<UserVotings> updateUserVotings(@Valid @RequestBody final UserVotings userVotings) throws URISyntaxException {
-        this.log.debug("REST request to update UserVotings : {}", userVotings);
-        if (userVotings.getId() == null) {
-            return this.createUserVotings(userVotings);
+    @RequestMapping(value = "/user-votings", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+    // @Timed
+    public ResponseEntity<UserVotingsDTO> updateUserVotings(@Valid @RequestBody final UserVotingsDTO userVotingsDTO)
+            throws URISyntaxException
+    {
+        this.log.debug("REST request to update UserVotings : {}", userVotingsDTO);
+        if (userVotingsDTO.getId() == null)
+        {
+            return this.createUserVotings(userVotingsDTO);
         }
-        final UserVotings result = this.userVotingsService.save(userVotings);
+        final UserVotings userVotings = UserVotingsConverter.toEntity(userVotingsDTO);
+        final UserVotingsDTO result = UserVotingsConverter.toDto(this.userVotingsService.save(userVotings));
         return ResponseEntity.ok()
                 .headers(HeaderUtil.createEntityUpdateAlert("userVotings", userVotings.getId().toString()))
                 .body(result);
     }
 
     /**
-     * GET  /user-votings : get all the userVotings.
+     * GET /user-votings : get all the userVotings.
      *
      * @return the ResponseEntity with status 200 (OK) and the list of userVotings in body
      */
-    @RequestMapping(value = "/user-votings",
-            method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    //    @Timed
-    public List<UserVotings> getAllUserVotings() {
+    @RequestMapping(value = "/user-votings", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    // @Timed
+    public List<UserVotingsDTO> getAllUserVotings()
+    {
         this.log.debug("REST request to get all UserVotings");
-        return this.userVotingsService.findAll();
+        return UserVotingsConverter.toDtoList(this.userVotingsService.findAll());
     }
 
     /**
-     * GET  /user-votings/:id : get the "id" userVotings.
+     * GET /user-votings/:id : get the "id" userVotings.
      *
-     * @param id the id of the userVotings to retrieve
+     * @param id
+     *            the id of the userVotings to retrieve
      * @return the ResponseEntity with status 200 (OK) and with body the userVotings, or with status 404 (Not Found)
      */
-    @RequestMapping(value = "/user-votings/{id}",
-            method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    //    @Timed
-    public ResponseEntity<UserVotings> getUserVotings(@PathVariable final Long id) {
+    @RequestMapping(value = "/user-votings/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    // @Timed
+    public ResponseEntity<UserVotings> getUserVotings(@PathVariable final Long id)
+    {
         this.log.debug("REST request to get UserVotings : {}", id);
         final UserVotings userVotings = this.userVotingsService.findOne(id);
         return Optional.ofNullable(userVotings)
@@ -116,16 +137,16 @@ public class UserVotingsResource {
     }
 
     /**
-     * DELETE  /user-votings/:id : delete the "id" userVotings.
+     * DELETE /user-votings/:id : delete the "id" userVotings.
      *
-     * @param id the id of the userVotings to delete
+     * @param id
+     *            the id of the userVotings to delete
      * @return the ResponseEntity with status 200 (OK)
      */
-    @RequestMapping(value = "/user-votings/{id}",
-            method = RequestMethod.DELETE,
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    //    @Timed
-    public ResponseEntity<Void> deleteUserVotings(@PathVariable final Long id) {
+    @RequestMapping(value = "/user-votings/{id}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
+    // @Timed
+    public ResponseEntity<Void> deleteUserVotings(@PathVariable final Long id)
+    {
         this.log.debug("REST request to delete UserVotings : {}", id);
         this.userVotingsService.delete(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert("userVotings", id.toString())).build();

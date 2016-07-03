@@ -11,12 +11,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.prodyna.pac.voting.domain.User;
-import com.prodyna.pac.voting.repository.AuthorityRepository;
 import com.prodyna.pac.voting.repository.UserRepository;
 import com.prodyna.pac.voting.security.SecurityUtils;
 import com.prodyna.pac.voting.service.UserService;
-import com.prodyna.pac.voting.web.rest.converter.UserConverter;
-import com.prodyna.pac.voting.web.rest.dto.ManagedUserDTO;
 
 /**
  * Service Implementation for managing User.
@@ -30,13 +27,9 @@ public class UserServiceImpl implements UserService
     @Inject
     private UserRepository userRepository;
 
-    @Inject
-    private AuthorityRepository authorityRepository;
-
     @Override
-    public User save(final ManagedUserDTO userDTO)
+    public User save(final User user)
     {
-        final User user = UserConverter.toEntity(userDTO, this.authorityRepository);
         final String encryptedPassword = new BCryptPasswordEncoder().encode(user.getPassword());
         user.setPassword(encryptedPassword);
 

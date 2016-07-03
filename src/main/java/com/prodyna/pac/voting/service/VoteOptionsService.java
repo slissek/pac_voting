@@ -4,7 +4,6 @@ import java.util.List;
 
 import com.prodyna.pac.voting.domain.Vote;
 import com.prodyna.pac.voting.domain.VoteOption;
-import com.prodyna.pac.voting.web.rest.dto.VoteOptionDTO;
 
 /**
  * Service Interface for managing VoteOptions.
@@ -19,7 +18,7 @@ public interface VoteOptionsService
      *            the entity to save
      * @return the persisted entity
      */
-    VoteOption save(VoteOptionDTO voteOptions);
+    VoteOption save(VoteOption voteOptions);
 
     /**
      * Get all the voteOptions.

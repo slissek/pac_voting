@@ -11,9 +11,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.prodyna.pac.voting.domain.Vote;
 import com.prodyna.pac.voting.repository.VoteRepository;
+import com.prodyna.pac.voting.service.UserVotingsService;
 import com.prodyna.pac.voting.service.VoteService;
-import com.prodyna.pac.voting.web.rest.converter.VoteConverter;
-import com.prodyna.pac.voting.web.rest.dto.VoteDTO;
 
 /**
  * Service Implementation for managing Vote.
@@ -28,6 +27,9 @@ public class VoteServiceImpl implements VoteService
     @Inject
     private VoteRepository voteRepository;
 
+    @Inject
+    private UserVotingsService userVotingsService;
+
     /**
      * Save a vote.
      *
@@ -36,12 +38,11 @@ public class VoteServiceImpl implements VoteService
      * @return the persisted entity
      */
     @Override
-    public Vote save(final VoteDTO voteDTO)
+    public Vote save(final Vote vote)
     {
-        final Vote vote = VoteConverter.toEntity(voteDTO);
         final Vote result = this.voteRepository.save(vote);
 
-        this.log.debug("Saved Vote : {}", voteDTO);
+        this.log.debug("Saved Vote : {}", vote);
 
         return result;
     }

@@ -2,7 +2,6 @@ package com.prodyna.pac.voting.web.rest;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -77,7 +76,8 @@ public class UserResource
         }
         else
         {
-            final ManagedUserDTO newUser = UserConverter.toDto(this.userService.save(userDTO));
+            final User user = UserConverter.toEntity(userDTO, this.authorityRepository);
+            final ManagedUserDTO newUser = UserConverter.toDto(this.userService.save(user));
             return ResponseEntity.created(new URI("/api/users/" + newUser.getId()))
                     .headers(HeaderUtil.createEntityCreationAlert("userManagement", newUser.getId().toString())).body(newUser);
         }
@@ -141,12 +141,7 @@ public class UserResource
     {
         this.log.debug("REST request to get all User");
 
-        final List<User> userList = this.userService.getAll();
-        final List<ManagedUserDTO> userDTOs = new ArrayList<ManagedUserDTO>();
-        for (final User user : userList)
-        {
-            userDTOs.add(UserConverter.toDto(user));
-        }
+        final List<ManagedUserDTO> userDTOs = UserConverter.toDtoList(this.userService.getAll());
         return new ResponseEntity<List<ManagedUserDTO>>(userDTOs, HttpStatus.OK);
     }
 

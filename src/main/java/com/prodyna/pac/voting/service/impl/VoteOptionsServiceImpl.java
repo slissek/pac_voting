@@ -13,8 +13,6 @@ import com.prodyna.pac.voting.domain.Vote;
 import com.prodyna.pac.voting.domain.VoteOption;
 import com.prodyna.pac.voting.repository.VoteOptionsRepository;
 import com.prodyna.pac.voting.service.VoteOptionsService;
-import com.prodyna.pac.voting.web.rest.converter.VoteOptionConverter;
-import com.prodyna.pac.voting.web.rest.dto.VoteOptionDTO;
 
 /**
  * Service Implementation for managing VoteOptions.
@@ -36,10 +34,10 @@ public class VoteOptionsServiceImpl implements VoteOptionsService
      * @return the persisted entity
      */
     @Override
-    public VoteOption save(final VoteOptionDTO voteOptionsDTO)
+    public VoteOption save(final VoteOption voteOption)
     {
-        this.log.debug("Request to save VoteOptions : {}", voteOptionsDTO);
-        final VoteOption result = this.voteOptionsRepository.save(VoteOptionConverter.toEntity(voteOptionsDTO));
+        this.log.debug("Request to save VoteOptions : {}", voteOption);
+        final VoteOption result = this.voteOptionsRepository.save(voteOption);
         return result;
     }
 

@@ -1,28 +1,19 @@
 package com.prodyna.pac.voting.web.rest;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.List;
-import java.util.Optional;
-
 import javax.inject.Inject;
-import javax.validation.Valid;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.prodyna.pac.voting.domain.VoteOption;
+import com.prodyna.pac.voting.service.UserVotingsService;
 import com.prodyna.pac.voting.service.VoteOptionsService;
-import com.prodyna.pac.voting.web.rest.converter.VoteOptionConverter;
-import com.prodyna.pac.voting.web.rest.dto.VoteOptionDTO;
+import com.prodyna.pac.voting.service.VoteService;
 import com.prodyna.pac.voting.web.rest.util.HeaderUtil;
 
 /**
@@ -36,7 +27,13 @@ public class VoteOptionsResource
     private final Logger log = LoggerFactory.getLogger(VoteOptionsResource.class);
 
     @Inject
+    private VoteService voteService;
+
+    @Inject
     private VoteOptionsService voteOptionsService;
+
+    @Inject
+    private UserVotingsService userVotingsService;
 
     /**
      * POST /vote-options : Create a new voteOptions.
@@ -48,24 +45,24 @@ public class VoteOptionsResource
      * @throws URISyntaxException
      *             if the Location URI syntax is incorrect
      */
-    @RequestMapping(value = "/vote-options", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    // @Timed
-    public ResponseEntity<VoteOptionDTO> createVoteOptions(@Valid @RequestBody final VoteOptionDTO voteOptionsDTO) throws URISyntaxException
-    {
-        this.log.debug("REST request to save VoteOptions : {}", voteOptionsDTO);
-
-        if (voteOptionsDTO.getId() != null)
-        {
-            return ResponseEntity.badRequest()
-                    .headers(HeaderUtil.createFailureAlert("voteOptions", "idexists", "A new voteOptions cannot already have an ID"))
-                    .body(null);
-        }
-
-        final VoteOptionDTO result = VoteOptionConverter.toDto(this.voteOptionsService.save(voteOptionsDTO));
-        return ResponseEntity.created(new URI("/api/vote-options/" + result.getId()))
-                .headers(HeaderUtil.createEntityCreationAlert("voteOptions", result.getId().toString()))
-                .body(result);
-    }
+    //    @RequestMapping(value = "/vote-options", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    //    // @Timed
+    //    public ResponseEntity<VoteOptionDTO> createVoteOptions(@Valid @RequestBody final VoteOptionDTO voteOptionsDTO) throws URISyntaxException
+    //    {
+    //        this.log.debug("REST request to save VoteOptions : {}", voteOptionsDTO);
+    //
+    //        if (voteOptionsDTO.getId() != null)
+    //        {
+    //            return ResponseEntity.badRequest()
+    //                    .headers(HeaderUtil.createFailureAlert("voteOptions", "idexists", "A new voteOptions cannot already have an ID"))
+    //                    .body(null);
+    //        }
+    //        final VoteOption voteOption = VoteOptionConverter.toEntity(voteOptionsDTO, this.voteService);
+    //        final VoteOptionDTO result = VoteOptionConverter.toDto(voteOption.getVote(), this.voteOptionsService.save(voteOption), this.userVotingsService);
+    //        return ResponseEntity.created(new URI("/api/vote-options/" + result.getId()))
+    //                .headers(HeaderUtil.createEntityCreationAlert("voteOptions", result.getId().toString()))
+    //                .body(result);
+    //    }
 
     /**
      * PUT /vote-options : Updates an existing voteOptions.
@@ -77,33 +74,35 @@ public class VoteOptionsResource
      * @throws URISyntaxException
      *             if the Location URI syntax is incorrect
      */
-    @RequestMapping(value = "/vote-options", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+    //    @RequestMapping(value = "/vote-options", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
     // @Timed
-    public ResponseEntity<VoteOptionDTO> updateVoteOptions(@Valid @RequestBody final VoteOptionDTO voteOptionsDTO) throws URISyntaxException
-    {
-        this.log.debug("REST request to update VoteOptions : {}", voteOptionsDTO);
-        if (voteOptionsDTO.getId() == null)
-        {
-            return this.createVoteOptions(voteOptionsDTO);
-        }
-        final VoteOptionDTO result = VoteOptionConverter.toDto(this.voteOptionsService.save(voteOptionsDTO));
-        return ResponseEntity.ok()
-                .headers(HeaderUtil.createEntityUpdateAlert("voteOptions", voteOptionsDTO.getId().toString()))
-                .body(result);
-    }
+    //    public ResponseEntity<VoteOptionDTO> updateVoteOptions(@Valid @RequestBody final VoteOptionDTO voteOptionsDTO) throws URISyntaxException
+    //    {
+    //        this.log.debug("REST request to update VoteOptions : {}", voteOptionsDTO);
+    //        if (voteOptionsDTO.getId() == null)
+    //        {
+    //            return this.createVoteOptions(voteOptionsDTO);
+    //        }
+    //        final VoteOption voteOption = VoteOptionConverter.toEntity(voteOptionsDTO, this.voteService);
+    //        final VoteOption savedVoteOption = this.voteOptionsService.save(voteOption);
+    //        final VoteOptionDTO result = VoteOptionConverter.toDto(savedVoteOption);
+    //        return ResponseEntity.ok()
+    //                .headers(HeaderUtil.createEntityUpdateAlert("voteOptions", voteOptionsDTO.getId().toString()))
+    //                .body(result);
+    //    }
 
     /**
      * GET /vote-options : get all the voteOptions.
      *
      * @return the ResponseEntity with status 200 (OK) and the list of voteOptions in body
      */
-    @RequestMapping(value = "/vote-options", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    // @Timed
-    public List<VoteOptionDTO> getAllVoteOptions()
-    {
-        this.log.debug("REST request to get all VoteOptions");
-        return VoteOptionConverter.toDtoList(this.voteOptionsService.findAll());
-    }
+    //    @RequestMapping(value = "/vote-options", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    //    // @Timed
+    //    public List<VoteOptionDTO> getAllVoteOptions()
+    //    {
+    //        this.log.debug("REST request to get all VoteOptions");
+    //        return VoteOptionConverter.toDtoList(this.voteOptionsService.findAll());
+    //    }
 
     /**
      * GET /vote-options/:id : get the "id" voteOptions.
@@ -112,18 +111,18 @@ public class VoteOptionsResource
      *            the id of the voteOptions to retrieve
      * @return the ResponseEntity with status 200 (OK) and with body the voteOptions, or with status 404 (Not Found)
      */
-    @RequestMapping(value = "/vote-options/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    // @Timed
-    public ResponseEntity<VoteOption> getVoteOptions(@PathVariable final Long id)
-    {
-        this.log.debug("REST request to get VoteOptions : {}", id);
-        final VoteOption voteOptions = this.voteOptionsService.findOne(id);
-        return Optional.ofNullable(voteOptions)
-                .map(result -> new ResponseEntity<>(
-                        result,
-                        HttpStatus.OK))
-                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
-    }
+    //    @RequestMapping(value = "/vote-options/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    //    // @Timed
+    //    public ResponseEntity<VoteOption> getVoteOptions(@PathVariable final Long id)
+    //    {
+    //        this.log.debug("REST request to get VoteOptions : {}", id);
+    //        final VoteOption voteOptions = this.voteOptionsService.findOne(id);
+    //        return Optional.ofNullable(voteOptions)
+    //                .map(result -> new ResponseEntity<>(
+    //                        result,
+    //                        HttpStatus.OK))
+    //                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    //    }
 
     /**
      * DELETE /vote-options/:id : delete the "id" voteOptions.

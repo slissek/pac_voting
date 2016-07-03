@@ -9,8 +9,10 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -50,8 +52,8 @@ public class Vote implements Serializable
     @Column(name = "topic", nullable = false)
     private String topic;
 
-    @OneToMany(mappedBy = "vote")
-    private Set<VoteOption> voteOptions = new HashSet<>();
+    @OneToMany(mappedBy = "vote", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private Set<VoteOption> voteOptions = new HashSet<VoteOption>();
 
     public Vote()
     {

@@ -21,7 +21,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.prodyna.pac.voting.domain.User;
 import com.prodyna.pac.voting.domain.Vote;
+import com.prodyna.pac.voting.security.SecurityUtils;
+import com.prodyna.pac.voting.service.UserService;
+import com.prodyna.pac.voting.service.UserVotingsService;
 import com.prodyna.pac.voting.service.VoteService;
 import com.prodyna.pac.voting.web.rest.converter.VoteConverter;
 import com.prodyna.pac.voting.web.rest.converter.VoteOptionConverter;
@@ -40,6 +44,12 @@ public class VoteResource
 
     @Inject
     private VoteService voteService;
+
+    @Inject
+    private UserService userService;
+
+    @Inject
+    private UserVotingsService userVotingsService;
 
     /**
      * POST /votes : Create a new vote.
@@ -63,7 +73,8 @@ public class VoteResource
                     .headers(HeaderUtil.createFailureAlert("vote", "idexists", "A new vote cannot already have an ID")).body(null);
         }
 
-        final VoteDTO result = VoteConverter.toDto(this.voteService.save(voteDTO));
+        final Vote vote = VoteConverter.toEntity(voteDTO, this.userService);
+        final VoteDTO result = VoteConverter.toDto(this.getCurrentUserId(), this.voteService.save(vote), this.userVotingsService);
         return ResponseEntity.created(new URI("/api/votes/" + result.getId()))
                 .headers(HeaderUtil.createEntityCreationAlert("vote", result.getId().toString()))
                 .body(result);
@@ -94,9 +105,9 @@ public class VoteResource
         if (vote != null)
         {
             vote.setTopic(voteDTO.getTopic());
-            vote.setVoteOptions(VoteOptionConverter.toEntitySet(voteDTO.getOptions()));
+            vote.setVoteOptions(VoteOptionConverter.toEntitySet(voteDTO.getVoteOptions(), vote));
 
-            final VoteDTO result = VoteConverter.toDto(this.voteService.save(voteDTO));
+            final VoteDTO result = VoteConverter.toDto(this.getCurrentUserId(), this.voteService.save(vote), this.userVotingsService);
             return ResponseEntity.ok()
                     .headers(HeaderUtil.createEntityUpdateAlert("vote", voteDTO.getId().toString()))
                     .body(result);
@@ -124,7 +135,8 @@ public class VoteResource
         this.log.debug("REST request to get a page of Votes");
 
         final List<VoteDTO> voteList = new ArrayList<VoteDTO>();
-        this.voteService.getAll().stream().forEach(vote -> voteList.add(VoteConverter.toDto(vote)));
+        this.voteService.getAll().stream()
+        .forEach(vote -> voteList.add(VoteConverter.toDto(this.getCurrentUserId(), vote, this.userVotingsService)));
         return new ResponseEntity<List<VoteDTO>>(voteList, HttpStatus.OK);
     }
 
@@ -162,5 +174,11 @@ public class VoteResource
         this.log.debug("REST request to delete Vote : {}", id);
         this.voteService.delete(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert("vote", id.toString())).build();
+    }
+
+    private Long getCurrentUserId()
+    {
+        final User user = this.userService.getUserByUserName(SecurityUtils.getCurrentUserName());
+        return user != null ? user.getId() : null;
     }
 }

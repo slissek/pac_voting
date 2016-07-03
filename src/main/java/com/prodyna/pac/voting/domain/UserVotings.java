@@ -47,7 +47,7 @@ public class UserVotings implements Serializable
     @Column(name = "vote_options_id", nullable = false)
     private Long voteOptionsId;
 
-    protected UserVotings()
+    public UserVotings()
     {
     }
 
@@ -83,12 +83,12 @@ public class UserVotings implements Serializable
         {
             return true;
         }
-        if (o == null || this.getClass() != o.getClass())
+        if ((o == null) || (this.getClass() != o.getClass()))
         {
             return false;
         }
         final UserVotings userVotings = (UserVotings) o;
-        if (userVotings.id == null || this.id == null)
+        if ((userVotings.id == null) || (this.id == null))
         {
             return false;
         }
