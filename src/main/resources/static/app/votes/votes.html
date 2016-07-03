@@ -1,53 +1,53 @@
-<div>
+<div ng-switch="vm.isAuthenticated()">
     <h3>Votes</h3>
-    <div class="row">
-        <div class="text-right">
-            <!-- TODO only if user is authenticated -->
-            <button type="button" class="btn btn-primary" ui-sref="home.new">
-                <span class="glyphicon glyphicon-plus"></span>&nbsp;
-                <span>Create a new Vote</span>
-            </button>
-        </div>
-    </div>
-    <div class="table-responsive" ng-switch="vm.isAuthenticated()">
-        <div id="votes" ng-repeat="vote in vm.votes">
-            <h5>{{vote.topic}}</h5>
-<!--             <div class="text-right" ng-switch-when="true"> -->
+    <div ng-switch-when="true">
+        <div class="row">
             <div class="text-right">
-                <!-- only if user is authenticated -->
-                <button type="button" class="btn" ui-sref="home.edit({id:vote.id})">
-                    <span class="glyphicon glyphicon-edit"></span>&nbsp;
-                    <span>Edit Vote</span>
+                <!-- TODO only if user is authenticated -->
+                <button type="button" class="btn btn-primary" ui-sref="home.new">
+                    <span class="glyphicon glyphicon-plus"></span>&nbsp;
+                    <span>Create a new Vote</span>
                 </button>
-                <!-- Only if user is creator or admin -->
-<!--                 <div ng-if="vote.userId == vm.currentAccount.id || vm.isAdmin == true"> -->
-                    <button type="button" class="btn btn-danger" ui-sref="home.delete({id:vote.id})">
+            </div>
+        </div>
+        <div class="table-responsive">
+            <div id="votes" ng-repeat="vote in vm.votes">
+                <h5>{{vote.topic}}</h5>
+                <div class="text-right" ng-if="vm.isEditAllowed(vote)">
+                    <!-- Only if user is admin or creator-->
+                    <button type="button" class="btn" ui-sref="home.edit({id:vote.id})">
+                        <span class="glyphicon glyphicon-edit"></span>&nbsp;
+                        <span>Edit Vote</span>
+                    </button>
+                    <!-- Only if user is admin -->
+                    <button type="button" class="btn btn-danger" has-authority="ROLE_ADMIN" ui-sref="home.delete({id:vote.id})">
                         <span class="glyphicon glyphicon-remove-circle"></span>&nbsp;
                         <span>Delete Vote</span>
                     </button>
-<!--                 </div> -->
-            </div>
-            <table class="table">
-                <tr id="options" ng-repeat="option in vote.voteOptions">
-                    <td>
-                        <input name="{{vote.id}}" type="radio" ng-model="option.userChoice" ng-value="true" ng-disabled="{{vote.userVoted==true}}" />
-                    </td>
-                    <td>
-                        {{option.text}}
-                    </td>
-                    <td>
-                        <div ng-if="vote.userVoted==true">{{option.percent}}%</div>
-                    </td>
-                </tr>
-            </table>
-<!--             <div ng-switch-when="true"> -->
+                </div>
+                <table class="table">
+                    <tr id="options" ng-repeat="option in vote.voteOptions">
+                        <td>
+                            <input name="{{vote.id}}" type="radio" ng-model="option.userChoice" ng-value="true" ng-disabled="{{vote.userVoted==true}}" />
+                        </td>
+                        <td>
+                            {{option.text}}
+                        </td>
+                        <td>
+                            <div ng-if="vote.userVoted==true">{{option.percent}}%</div>
+                        </td>
+                    </tr>
+                </table>
                 <div ng-if="vote.userVoted==false">
                     <button type="submit" class="btn btn-primary" ng-click="vm.save(vote)">
                         <span class="glyphicon glyphicon-check"></span>&nbsp;
                         <span>Submit Vote</span>
                     </button>
                 </div>
-<!--             </div> -->
+            </div>
         </div>
+    </div>
+    <div ng-switch-when="false">
+        <h5><i>Please sign in to see available votes.</i></h5>
     </div>
 </div>

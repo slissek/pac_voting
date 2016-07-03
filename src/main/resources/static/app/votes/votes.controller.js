@@ -4,29 +4,63 @@
 
     angular.module('VotingApp').controller('VotesController', VotesController);
     
-    VotesController.$inject = ['Principal', 'Votes', 'UserVotes'];
+    VotesController.$inject = ['$scope', 'Principal', 'Votes', 'UserVotes'];
 
-    function VotesController(Principal, Votes, UserVotes)
+    function VotesController($scope, Principal, Votes, UserVotes)
     {
         var vm = this;
-        vm.currentAccount = null;
-        vm.isAuthenticated = Principal.isAuthenticated;
-        vm.isAdmin = Principal.hasAuthority("ROLE_ADMIN")
+        vm.account = null;
+        vm.isAuthenticated = null;
+        vm.isEditAllowed = isEditAllowed;
+        vm.editAllowed = false;
         vm.loadAll = loadAll;
         vm.save = save;
         vm.userVote = {};
         vm.votes = [];
 
-        vm.loadAll();
-
-        Principal.identity().then(function(account) {
-            vm.currentAccount = account;
-            if (vm.currentAccount !== null) {
-                vm.userVote.userId = vm.currentAccount.id;
-            }
+        $scope.$on('authenticationSuccess', function()
+        {
+            init();
         });
 
-        function loadAll() {
+        init();
+
+        function init() 
+        {
+            getAccount();
+            loadAll();
+        }
+
+        function isEditAllowed(vote) 
+        {
+            if (!vm.editAllowed) 
+            {
+                if(vm.account.id == vote.userId)
+                {
+                    vm.editAllowed = true;
+                } else {
+                    var isAdmin = Principal.hasAuthority('ROLE_ADMIN');
+                    if (isAdmin) {
+                        vm.editAllowed = true;
+                    } else {
+                        vm.editAllowed = false;
+                    }
+                }
+            }
+            return vm.editAllowed;
+        }
+
+        function getAccount()
+        {
+            Principal.identity().then(function(account)
+            {
+                vm.account = account;
+                vm.isAuthenticated = Principal.isAuthenticated;
+            });
+        }
+
+        function loadAll() 
+        {
             Votes.query(
                 function (result, headers) {
 //                    vm.totalItems = headers('X-Total-Count');
@@ -43,6 +77,7 @@
         }
 
         function save(vote) {
+            vm.userVote.userId = vm.account.id;
             vm.userVote.voteId = vote.id;
             for (var i=0; i<vote.voteOptions.length; i++) {
                 var voteOptions = vote.voteOptions[i];

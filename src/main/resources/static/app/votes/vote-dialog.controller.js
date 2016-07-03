@@ -25,6 +25,9 @@
         });
 
         function addVoteOption() {
+            if(vm.vote.voteOptions === undefined) {
+                vm.vote.voteOptions = [];
+            }
             vm.vote.voteOptions.push(vm.voteOption.newOption);
             vm.voteOption.newOption = {id: null, text:''}
         }
