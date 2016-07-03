@@ -249,20 +249,4 @@ public class UserVotingsResourceIntTest {
         final List<UserVotings> userVotings = this.userVotingsRepository.findAll();
         assertThat(userVotings).hasSize(databaseSizeBeforeDelete - 1);
     }
-
-    @Test
-    @Transactional
-    public void searchUserVotings() throws Exception {
-        // Initialize the database
-        this.userVotingsService.save(this.userVotings);
-
-        // Search the userVotings
-        this.restUserVotingsMockMvc.perform(get("/api/_search/user-votings?query=id:" + this.userVotings.getId()))
-        .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(jsonPath("$.[*].id").value(hasItem(this.userVotings.getId().intValue())))
-        .andExpect(jsonPath("$.[*].userId").value(hasItem(DEFAULT_USER_ID.intValue())))
-        .andExpect(jsonPath("$.[*].voteId").value(hasItem(DEFAULT_VOTE_ID.intValue())))
-        .andExpect(jsonPath("$.[*].voteOptionsId").value(hasItem(DEFAULT_VOTE_OPTIONS_ID.intValue())));
-    }
 }
