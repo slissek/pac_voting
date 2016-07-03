@@ -28,7 +28,7 @@
 <!--                 </div> -->
             </div>
             <table class="table">
-                <tr id="options" ng-repeat="option in vote.options">
+                <tr id="options" ng-repeat="option in vote.voteOptions">
                     <td>
                         <input name="{{vote.id}}" type="radio" ng-model="option.userChoice" ng-value="true" ng-disabled="{{vote.userVoted==true}}" />
                     </td>

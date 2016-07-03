@@ -44,8 +44,8 @@
 
         function save(vote) {
             vm.userVote.voteId = vote.id;
-            for (var i=0; i<vote.options.length; i++) {
-                var voteOptions = vote.options[i];
+            for (var i=0; i<vote.voteOptions.length; i++) {
+                var voteOptions = vote.voteOptions[i];
                 if (voteOptions.userChoice) {
                     vm.userVote.voteOptionsId = voteOptions.id;
                     break;

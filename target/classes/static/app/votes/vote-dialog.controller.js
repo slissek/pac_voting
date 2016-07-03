@@ -22,7 +22,6 @@
 
         Principal.identity().then(function(account) {
             vm.currentAccount = account;
-            vm.vote.userId = vm.currentAccount.id;
         });
 
         function addVoteOption() {
@@ -57,6 +56,7 @@
 
         function save()
         {
+            vm.vote.userId = vm.currentAccount.id;
             if (vm.vote.id !== null) {
                 Votes.update(vm.vote, onSaveSuccess, onSaveError);
             } else {

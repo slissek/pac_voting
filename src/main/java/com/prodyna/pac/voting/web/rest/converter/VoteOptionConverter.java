@@ -49,7 +49,7 @@ public class VoteOptionConverter
         {
             if (countForVoteId != 0)
             {
-                percent = (countForVoteIdAndOption / countForVoteId) * 100;
+                percent =  (long) (((double) countForVoteIdAndOption / (double) countForVoteId) * 100);
             }
         }
 
