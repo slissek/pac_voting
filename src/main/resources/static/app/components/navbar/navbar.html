@@ -22,8 +22,26 @@
                 <ul class="dropdown-menu" uib-dropdown-menu>
                     <li ui-sref-active="active">
                         <a ui-sref="user-management"> 
-                        <span class="glyphicon glyphicon-user"></span>&nbsp; 
-                        <span>User management</span>
+                            <span class="glyphicon glyphicon-user"></span>&nbsp; 
+                            <span>User management</span>
+                        </a>
+                    </li>
+                    <li ui-sref-active="active">
+                        <a ui-sref="metrics"">
+                            <span class="glyphicon glyphicon-dashboard"></span>&nbsp;
+                            <span>Metrics</span>
+                        </a>
+                    </li>
+                    <li ui-sref-active="active">
+                        <a ui-sref="health" ng-click="vm.collapseNavbar()">
+                            <span class="glyphicon glyphicon-heart"></span>&nbsp;
+                            <span>Health</span>
+                        </a>
+                    </li>
+                    <li ui-sref-active="active">
+                        <a ui-sref="configuration" ng-click="vm.collapseNavbar()">
+                            <span class="glyphicon glyphicon-list-alt"></span>&nbsp;
+                            <span>Configuration</span>
                         </a>
                     </li>
                 </ul>

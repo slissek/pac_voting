@@ -1,7 +1,6 @@
 package com.prodyna.pac.voting.web.rest;
 
 import java.util.List;
-import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
@@ -68,9 +67,15 @@ public class AccountResource
     @Timed
     public ResponseEntity<ManagedUserDTO> getAccount()
     {
-        return Optional.ofNullable(this.userService.getUserWithAuthorities())
-                .map(user -> new ResponseEntity<>(UserConverter.toDto(user), HttpStatus.OK))
-                .orElse(new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
+        final User user = this.userService.getUserWithAuthorities();
+        if (user != null)
+        {
+            return new ResponseEntity<ManagedUserDTO>(UserConverter.toDto(user), HttpStatus.OK);
+        }
+        else
+        {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     /**
@@ -108,11 +113,13 @@ public class AccountResource
     @Timed
     public ResponseEntity<List<PersistentToken>> getCurrentSessions()
     {
-        final User user = this.userService.getUserByUserName (SecurityUtils.getCurrentUserName());
+        final User user = this.userService.getUserByUserName(SecurityUtils.getCurrentUserName());
         if (user != null)
         {
             return new ResponseEntity<>(this.persistentTokenRepository.findByUser(user), HttpStatus.OK);
-        } else {
+        }
+        else
+        {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

@@ -16,13 +16,14 @@ import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.data.repository.query.SecurityEvaluationContextExtension;
 import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.csrf.CsrfFilter;
-import org.springframework.security.data.repository.query.SecurityEvaluationContextExtension;
 
 import com.prodyna.pac.voting.security.AjaxAuthenticationFailureHandler;
 import com.prodyna.pac.voting.security.AjaxAuthenticationSuccessHandler;
 import com.prodyna.pac.voting.security.AjaxLogoutSuccessHandler;
+import com.prodyna.pac.voting.security.AuthoritiesConstants;
 import com.prodyna.pac.voting.security.CustomAccessDeniedHandler;
 import com.prodyna.pac.voting.security.Http401UnauthorizedEntryPoint;
 import com.prodyna.pac.voting.web.filter.CsrfCookieGeneratorFilter;
@@ -117,6 +118,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter
         .and()
             .authorizeRequests()
             .antMatchers("/api/authenticate").permitAll()
+            .antMatchers("/management/**").hasAuthority(AuthoritiesConstants.ADMIN)
             .antMatchers("/api/**").authenticated();
     }
     // @formatter:on

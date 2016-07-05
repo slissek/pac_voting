@@ -26,8 +26,11 @@ public class VoteOptionConverter
 
     public static Set<VoteOption> toEntitySet(final List<VoteOptionDTO> voteOptionDTOs, final Vote vote)
     {
-        final Set<VoteOption> voteOptions = new HashSet<VoteOption>(voteOptionDTOs.size());
-        voteOptionDTOs.stream().forEach(voteOptionDTO -> voteOptions.add(VoteOptionConverter.toEntity(voteOptionDTO, vote)));
+        final Set<VoteOption> voteOptions = new HashSet<VoteOption>();
+        if (voteOptionDTOs != null)
+        {
+            voteOptionDTOs.stream().forEach(voteOptionDTO -> voteOptions.add(VoteOptionConverter.toEntity(voteOptionDTO, vote)));
+        }
         return voteOptions;
     }
 
@@ -43,13 +46,13 @@ public class VoteOptionConverter
 
         final Long countForVoteId = userVotingsService.getCountForVoteId(vote.getId());
         final Long countForVoteIdAndOption = userVotingsService.getCountForVoteIdAndOption(vote.getId(), voteOption.getId());
-        Long percent = 0L;
+        int percent = 0;
 
         if ((countForVoteId != null) && (countForVoteIdAndOption != null))
         {
             if (countForVoteId != 0)
             {
-                percent =  (long) (((double) countForVoteIdAndOption / (double) countForVoteId) * 100);
+                percent = (int) (((double) countForVoteIdAndOption / (double) countForVoteId) * 100);
             }
         }
 
@@ -66,9 +69,13 @@ public class VoteOptionConverter
     public static List<VoteOptionDTO> toDtoList(final Vote vote, final Collection<VoteOption> voteOptions,
             final UserVotingsService userVotingsService, final List<UserVotings> userVotings)
     {
-        final List<VoteOptionDTO> voteOptionDTOs = new ArrayList<VoteOptionDTO>(voteOptions.size());
-        voteOptions.stream()
-        .forEach(voteOption -> voteOptionDTOs.add(VoteOptionConverter.toDto(vote, voteOption, userVotingsService, userVotings)));
+        final List<VoteOptionDTO> voteOptionDTOs = new ArrayList<VoteOptionDTO>();
+        if (voteOptions != null)
+        {
+            voteOptions.stream()
+            .forEach(
+                    voteOption -> voteOptionDTOs.add(VoteOptionConverter.toDto(vote, voteOption, userVotingsService, userVotings)));
+        }
         return voteOptionDTOs;
     }
 

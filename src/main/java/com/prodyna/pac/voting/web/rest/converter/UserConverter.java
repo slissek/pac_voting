@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import com.prodyna.pac.voting.domain.Authority;
 import com.prodyna.pac.voting.domain.User;
@@ -33,8 +32,20 @@ public class UserConverter
 
     public static ManagedUserDTO toDto(final User user)
     {
-        return new ManagedUserDTO(user.getId(), user.getUserName(), user.getFirstName(), user.getLastName(), user.getPassword(),
-                user.getAuthorities().stream().map(Authority::getName).collect(Collectors.toSet()));
+        final Set<String> authorities = new HashSet<String>(user.getAuthorities().size());
+        user.getAuthorities().stream().forEach(authority -> {
+            authorities.add(authority.getName());
+        });
+
+        final ManagedUserDTO managedUserDTO = new ManagedUserDTO();
+        managedUserDTO.setId(user.getId());
+        managedUserDTO.setUserName(user.getUserName());
+        managedUserDTO.setFirstName(user.getFirstName());
+        managedUserDTO.setLastName(user.getLastName());
+        managedUserDTO.setPassword(user.getPassword());
+        managedUserDTO.setAuthorities(authorities);
+
+        return managedUserDTO;
     }
 
     public static List<ManagedUserDTO> toDtoList(final List<User> users)

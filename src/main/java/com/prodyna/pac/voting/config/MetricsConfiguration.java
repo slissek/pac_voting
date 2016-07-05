@@ -27,6 +27,8 @@ import com.codahale.metrics.jvm.ThreadStatesGaugeSet;
 import com.ryantenney.metrics.spring.config.annotation.EnableMetrics;
 import com.ryantenney.metrics.spring.config.annotation.MetricsConfigurerAdapter;
 
+import fr.ippon.spark.metrics.SparkReporter;
+
 @Configuration
 @EnableMetrics(proxyTargetClass = true)
 public class MetricsConfiguration extends MetricsConfigurerAdapter
@@ -115,30 +117,30 @@ public class MetricsConfiguration extends MetricsConfigurerAdapter
         }
     }
 
-    //    @Configuration
-    //    @ConditionalOnClass(SparkReporter.class)
-    //    public static class SparkRegistry
-    //    {
-    //        private final Logger log = LoggerFactory.getLogger(SparkRegistry.class);
-    //
-    //    @Inject
-    //        private MetricRegistry metricRegistry;
-    //
-    //    @Inject
-    //        private ApplicationProperties applicationProperties;
-    //
-    //        @PostConstruct
-    //        private void init()
-    //        {
-    //            if (this.applicationProperties.getMetrics().getSpark().isEnabled())
-    //            {
-    //                this.log.info("Initializing Metrics Spark reporting");
-    //                final String sparkHost = this.applicationProperties.getMetrics().getSpark().getHost();
-    //                final Integer sparkPort = this.applicationProperties.getMetrics().getSpark().getPort();
-    //                final SparkReporter sparkReporter = SparkReporter.forRegistry(this.metricRegistry).convertRatesTo(TimeUnit.SECONDS)
-    //                        .convertDurationsTo(TimeUnit.MILLISECONDS).build(sparkHost, sparkPort);
-    //                sparkReporter.start(1, TimeUnit.MINUTES);
-    //            }
-    //        }
-    //    }
+    @Configuration
+    @ConditionalOnClass(SparkReporter.class)
+    public static class SparkRegistry
+    {
+        private final Logger log = LoggerFactory.getLogger(SparkRegistry.class);
+
+        @Inject
+        private MetricRegistry metricRegistry;
+
+        @Inject
+        private ApplicationProperties applicationProperties;
+
+        @PostConstruct
+        private void init()
+        {
+            if (this.applicationProperties.getMetrics().getSpark().isEnabled())
+            {
+                this.log.info("Initializing Metrics Spark reporting");
+                final String sparkHost = this.applicationProperties.getMetrics().getSpark().getHost();
+                final Integer sparkPort = this.applicationProperties.getMetrics().getSpark().getPort();
+                final SparkReporter sparkReporter = SparkReporter.forRegistry(this.metricRegistry).convertRatesTo(TimeUnit.SECONDS)
+                        .convertDurationsTo(TimeUnit.MILLISECONDS).build(sparkHost, sparkPort);
+                sparkReporter.start(1, TimeUnit.MINUTES);
+            }
+        }
+    }
 }

@@ -35,23 +35,21 @@ public class ManagedUserDTO
     {
     }
 
-    public ManagedUserDTO(final Long userId, final String userName, final String firstName, final String lastName, final String password,
-            final Set<String> authorities)
-    {
-        this.id = userId;
-        this.userName = userName;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.password = password;
-        this.authorities = authorities;
-    }
-
     /**
      * @return the id
      */
     public Long getId()
     {
         return this.id;
+    }
+
+    /**
+     * @param id
+     *            the id to set
+     */
+    public void setId(final Long id)
+    {
+        this.id = id;
     }
 
     /**
@@ -63,11 +61,29 @@ public class ManagedUserDTO
     }
 
     /**
+     * @param userName
+     *            the userName to set
+     */
+    public void setUserName(final String userName)
+    {
+        this.userName = userName;
+    }
+
+    /**
      * @return the firstName
      */
     public String getFirstName()
     {
         return this.firstName;
+    }
+
+    /**
+     * @param firstName
+     *            the firstName to set
+     */
+    public void setFirstName(final String firstName)
+    {
+        this.firstName = firstName;
     }
 
     /**
@@ -79,11 +95,29 @@ public class ManagedUserDTO
     }
 
     /**
+     * @param lastName
+     *            the lastName to set
+     */
+    public void setLastName(final String lastName)
+    {
+        this.lastName = lastName;
+    }
+
+    /**
      * @return the password
      */
     public String getPassword()
     {
         return this.password;
+    }
+
+    /**
+     * @param password
+     *            the password to set
+     */
+    public void setPassword(final String password)
+    {
+        this.password = password;
     }
 
     /**
@@ -95,13 +129,11 @@ public class ManagedUserDTO
     }
 
     /**
-     * {@inheritDoc}
+     * @param authorities
+     *            the authorities to set
      */
-    @Override
-    public String toString()
+    public void setAuthorities(final Set<String> authorities)
     {
-        return "UserDTO [userName=" + this.userName + ", firstName=" + this.firstName + ", lastName=" + this.lastName + ", authorities="
-                + this.authorities + "]";
+        this.authorities = authorities;
     }
-
 }

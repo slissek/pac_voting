@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.codahale.metrics.annotation.Timed;
 import com.prodyna.pac.voting.domain.UserVotings;
 import com.prodyna.pac.voting.service.UserVotingsService;
 import com.prodyna.pac.voting.web.rest.converter.UserVotingsConverter;
@@ -49,7 +50,7 @@ public class UserVotingsResource
      *             if the Location URI syntax is incorrect
      */
     @RequestMapping(value = "/user-votings", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    // @Timed
+    @Timed
     public ResponseEntity<UserVotingsDTO> createUserVotings(@Valid @RequestBody final UserVotingsDTO userVotingsDTO)
             throws URISyntaxException
     {
@@ -61,7 +62,8 @@ public class UserVotingsResource
                     .body(null);
         }
         // Check if user already voted
-        final List<UserVotings> findByUserIdAndVoteId = this.userVotingsService.findByUserIdAndVoteId(userVotingsDTO.getUserId(), userVotingsDTO.getVoteId());
+        final List<UserVotings> findByUserIdAndVoteId = this.userVotingsService.findByUserIdAndVoteId(userVotingsDTO.getUserId(),
+                userVotingsDTO.getVoteId());
         if ((findByUserIdAndVoteId != null) && (findByUserIdAndVoteId.size() != 0))
         {
             return ResponseEntity.badRequest()
@@ -87,7 +89,7 @@ public class UserVotingsResource
      *             if the Location URI syntax is incorrect
      */
     @RequestMapping(value = "/user-votings", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
-    // @Timed
+    @Timed
     public ResponseEntity<UserVotingsDTO> updateUserVotings(@Valid @RequestBody final UserVotingsDTO userVotingsDTO)
             throws URISyntaxException
     {
@@ -109,7 +111,7 @@ public class UserVotingsResource
      * @return the ResponseEntity with status 200 (OK) and the list of userVotings in body
      */
     @RequestMapping(value = "/user-votings", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    // @Timed
+    @Timed
     public List<UserVotingsDTO> getAllUserVotings()
     {
         this.log.debug("REST request to get all UserVotings");
@@ -124,7 +126,7 @@ public class UserVotingsResource
      * @return the ResponseEntity with status 200 (OK) and with body the userVotings, or with status 404 (Not Found)
      */
     @RequestMapping(value = "/user-votings/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    // @Timed
+    @Timed
     public ResponseEntity<UserVotings> getUserVotings(@PathVariable final Long id)
     {
         this.log.debug("REST request to get UserVotings : {}", id);
@@ -144,7 +146,7 @@ public class UserVotingsResource
      * @return the ResponseEntity with status 200 (OK)
      */
     @RequestMapping(value = "/user-votings/{id}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
-    // @Timed
+    @Timed
     public ResponseEntity<Void> deleteUserVotings(@PathVariable final Long id)
     {
         this.log.debug("REST request to delete UserVotings : {}", id);

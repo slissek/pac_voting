@@ -13,7 +13,7 @@ public class VoteOptionDTO
     @Size(max = 100)
     private String text;
 
-    private float percent;
+    private int percent;
 
     private boolean userChoice = false;
 
@@ -75,7 +75,7 @@ public class VoteOptionDTO
     /**
      * @return the percent
      */
-    public float getPercent()
+    public int getPercent()
     {
         return this.percent;
     }
@@ -84,7 +84,7 @@ public class VoteOptionDTO
      * @param percent
      *            the percent to set
      */
-    public void setPercent(final float percent)
+    public void setPercent(final int percent)
     {
         this.percent = percent;
     }

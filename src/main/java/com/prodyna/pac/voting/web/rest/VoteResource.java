@@ -4,14 +4,12 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.codahale.metrics.annotation.Timed;
 import com.prodyna.pac.voting.domain.User;
 import com.prodyna.pac.voting.domain.Vote;
 import com.prodyna.pac.voting.security.SecurityUtils;
@@ -62,7 +61,7 @@ public class VoteResource
      *             if the Location URI syntax is incorrect
      */
     @RequestMapping(value = "/votes", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    // @Timed
+    @Timed
     public ResponseEntity<VoteDTO> createVote(@Valid @RequestBody final VoteDTO voteDTO) throws URISyntaxException
     {
         this.log.debug("REST request to save Vote : {}", voteDTO);
@@ -91,7 +90,7 @@ public class VoteResource
      *             if the Location URI syntax is incorrect
      */
     @RequestMapping(value = "/votes", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
-    // @Timed
+    @Timed
     public ResponseEntity<VoteDTO> updateVote(@Valid @RequestBody final VoteDTO voteDTO) throws URISyntaxException
     {
         this.log.debug("REST request to update Vote : {}", voteDTO);
@@ -104,6 +103,7 @@ public class VoteResource
         final Vote vote = this.voteService.findOne(voteDTO.getId());
         if (vote != null)
         {
+            vote.setCreator(this.userService.getUserById(voteDTO.getUserId()));
             vote.setTopic(voteDTO.getTopic());
             vote.setVoteOptions(VoteOptionConverter.toEntitySet(voteDTO.getVoteOptions(), vote));
 
@@ -121,18 +121,16 @@ public class VoteResource
     /**
      * GET /votes : get all the votes.
      *
-     * @param pageable
-     *            the pagination information
      * @return the ResponseEntity with status 200 (OK) and the list of votes in body
      * @throws URISyntaxException
      *             if there is an error to generate the pagination HTTP headers
      */
     @RequestMapping(value = "/votes", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    // @Timed
-    public ResponseEntity<List<VoteDTO>> getAllVotes(final Pageable pageable)
+    @Timed
+    public ResponseEntity<List<VoteDTO>> getAllVotes()
             throws URISyntaxException
     {
-        this.log.debug("REST request to get a page of Votes");
+        this.log.debug("REST request to get all Votes");
 
         final List<VoteDTO> voteList = new ArrayList<VoteDTO>();
         this.voteService.getAll().stream()
@@ -148,16 +146,21 @@ public class VoteResource
      * @return the ResponseEntity with status 200 (OK) and with body the vote, or with status 404 (Not Found)
      */
     @RequestMapping(value = "/votes/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    // @Timed
-    public ResponseEntity<Vote> getVote(@PathVariable final Long id)
+    @Timed
+    public ResponseEntity<VoteDTO> getVote(@PathVariable final Long id)
     {
         this.log.debug("REST request to get Vote : {}", id);
+
         final Vote vote = this.voteService.findOne(id);
-        return Optional.ofNullable(vote)
-                .map(result -> new ResponseEntity<>(
-                        result,
-                        HttpStatus.OK))
-                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        if (vote != null)
+        {
+            final VoteDTO voteDTO = VoteConverter.toDto(this.getCurrentUserId(), vote, this.userVotingsService);
+            return new ResponseEntity<VoteDTO>(voteDTO, HttpStatus.OK);
+        }
+        else
+        {
+            return new ResponseEntity<VoteDTO>(HttpStatus.NOT_FOUND);
+        }
     }
 
     /**
@@ -168,7 +171,7 @@ public class VoteResource
      * @return the ResponseEntity with status 200 (OK)
      */
     @RequestMapping(value = "/votes/{id}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
-    // @Timed
+    @Timed
     public ResponseEntity<Void> deleteVote(@PathVariable final Long id)
     {
         this.log.debug("REST request to delete Vote : {}", id);

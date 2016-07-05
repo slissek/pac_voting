@@ -2,6 +2,7 @@ package com.prodyna.pac.voting.web.rest;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.codahale.metrics.annotation.Timed;
 import com.prodyna.pac.voting.domain.Authority;
 import com.prodyna.pac.voting.domain.User;
 import com.prodyna.pac.voting.repository.AuthorityRepository;
@@ -37,7 +39,6 @@ import com.prodyna.pac.voting.web.rest.util.HeaderUtil;
 @RequestMapping("/api")
 public class UserResource
 {
-
     private final Logger log = LoggerFactory.getLogger(UserResource.class);
 
     @Inject
@@ -57,7 +58,7 @@ public class UserResource
      *             if the Location URI syntax is incorrect
      */
     @RequestMapping(value = "/users", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    // @Timed
+    @Timed
     @Secured(AuthoritiesConstants.ADMIN)
     public ResponseEntity<ManagedUserDTO> createUser(@RequestBody final ManagedUserDTO userDTO) throws URISyntaxException
     {
@@ -68,6 +69,11 @@ public class UserResource
             return ResponseEntity.badRequest()
                     .headers(HeaderUtil.createFailureAlert("userManagement", "idexists", "A new user cannot already have an ID"))
                     .body(null);
+        }
+        else if (userDTO.getUserName() == null)
+        {
+            return ResponseEntity.badRequest()
+                    .headers(HeaderUtil.createFailureAlert("userManagement", "usernamemissing", "Username is mandatory")).body(null);
         }
         else if (this.userService.getUserByUserName(userDTO.getUserName()) != null)
         {
@@ -94,7 +100,7 @@ public class UserResource
      *             if the Location URI syntax is incorrect
      */
     @RequestMapping(value = "/users", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
-    // @Timed
+    @Timed
     @Transactional
     @Secured(AuthoritiesConstants.ADMIN)
     public ResponseEntity<ManagedUserDTO> updateUser(@Valid @RequestBody final ManagedUserDTO userDTO) throws URISyntaxException
@@ -115,10 +121,10 @@ public class UserResource
             userById.setFirstName(userDTO.getFirstName());
             userById.setLastName(userDTO.getLastName());
 
-            final Set<Authority> authorities = userById.getAuthorities();
-            authorities.clear();
+            final Set<Authority> authorities = new HashSet<Authority>();
 
             userDTO.getAuthorities().stream().forEach(authority -> authorities.add(this.authorityRepository.findOne(authority)));
+            userById.setAuthorities(authorities);
 
             return ResponseEntity.ok().headers(HeaderUtil.createAlert("userManagement.updated", userDTO.getUserName()))
                     .body(UserConverter.toDto(this.userService.getUserById(userDTO.getId())));
@@ -135,7 +141,7 @@ public class UserResource
      * @return the ResponseEntity with status 200 (OK) and the list of user in body
      */
     @RequestMapping(value = "/users", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    // @Timed
+    @Timed
     @Transactional(readOnly = true)
     public ResponseEntity<List<ManagedUserDTO>> getAllUser() throws URISyntaxException
     {
@@ -153,7 +159,7 @@ public class UserResource
      * @return the ResponseEntity with status 200 (OK) and with body the user, or with status 404 (Not Found)
      */
     @RequestMapping(value = "/users/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    // @Timed
+    @Timed
     public ResponseEntity<ManagedUserDTO> getUser(@PathVariable final Long id)
     {
         this.log.debug("REST request to get User : {}", id);
@@ -179,7 +185,7 @@ public class UserResource
      * @return the ResponseEntity with status 200 (OK)
      */
     @RequestMapping(value = "/users/{id}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
-    // @Timed
+    @Timed
     @Secured(AuthoritiesConstants.ADMIN)
     public ResponseEntity<Void> deleteUser(@PathVariable final Long id)
     {

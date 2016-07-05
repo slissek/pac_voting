@@ -45,17 +45,30 @@
     <!-- inject:js -->
     <script src="app/app.js"></script>
     <script src="app/app.state.js"></script>
+    <script src="app/admin/configuration/configuration.controller.js"></script>
+    <script src="app/admin/configuration/configuration.service.js"></script>
+    <script src="app/admin/health/health.controller.js"></script>
+    <script src="app/admin/health/health.modal.controller.js"></script>
+    <script src="app/admin/health/health.service.js"></script>
+    <script src="app/admin/metrics/metrics.controller.js"></script>
+    <script src="app/admin/metrics/metrics.modal.controller.js"></script>
+    <script src="app/admin/metrics/metrics.service.js"></script>
     <script src="app/admin/user-management/password-strength.directive.js"></script>
     <script src="app/admin/user-management/user-magagement-delete-dialog.controller.js"></script>
     <script src="app/admin/user-management/user-management-detail.controller.js"></script>
     <script src="app/admin/user-management/user-management-dialog.controller.js"></script>
     <script src="app/admin/user-management/user-management.controller.js"></script>
+    <script src="app/components/alert/alert.directive.js"></script>
+    <script src="app/components/alert/alert-error.directive.js"></script>
+    <script src="app/components/alert/alert.service.js"></script>
     <script src="app/components/login/login-dialog.controller.js"></script>
     <script src="app/components/logout/logout-dialog.controller.js"></script>
     <script src="app/components/navbar/navbar.controller.js"></script>
     <script src="app/config/http.config.js"></script>
     <script src="app/home/home.controller.js"></script>
     <script src="app/interceptor/auth-expired.interceptor.js"></script>
+    <script src="app/interceptor/errorhandler.interceptor.js"></script>
+    <script src="app/interceptor/notification.interceptor.js"></script>
     <script src="app/services/auth/account.service.js"></script>
     <script src="app/services/auth/auth.service.js"></script>
     <script src="app/services/auth/auth.session.service.js"></script>
@@ -69,8 +82,5 @@
     <script src="app/votes/vote-delete-dialog.controller.js"></script>
     <script src="app/votes/vote-dialog.controller.js"></script>
     <script src="app/votes/votes.controller.js"></script>
-
-    <!-- TODO delete me -->
-    <script src="app/about/scotch.controller.js"></script>
 </body>
 </html>

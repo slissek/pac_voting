@@ -245,6 +245,53 @@
             }]
         })
 
+        .state('metrics', {
+            parent: 'admin',
+            url: '/metrics',
+            data: {
+                authorities: ['ROLE_ADMIN']
+            },
+            views: {
+                'content@' :
+                {
+                    templateUrl: 'app/admin/metrics/metrics.html',
+                    controller: 'MetricsMonitoringController',
+                    controllerAs: 'vm'
+                }
+            }
+        })
+
+        .state('configuration', {
+            parent: 'admin',
+            url: '/configuration',
+            data: {
+                authorities: ['ROLE_ADMIN']
+            },
+            views: {
+                'content@' :
+                {
+                    templateUrl: 'app/admin/configuration/configuration.html',
+                    controller: 'ConfigurationController',
+                    controllerAs: 'vm'
+                }
+            }
+        })
+
+        .state('health', {
+            parent: 'admin',
+            url: '/health',
+            data: {
+                authorities: ['ROLE_ADMIN']
+            },
+            views: {
+                'content@': {
+                    templateUrl: 'app/admin/health/health.html',
+                    controller: 'HealthCheckController',
+                    controllerAs: 'vm'
+                }
+            }
+        })
+
         // ABOUT PAGE AND MULTIPLE NAMED VIEWS
         .state('about',
         {
@@ -252,23 +299,9 @@
             url : '/about',
             views :
             {
-                // the main template will be placed here (relatively named)
                 'content@' :
                 {
-                    templateUrl : 'app/about/partial-about.html'
-                },
-
-                // the child views will be defined here (absolutely named)
-                'columnOne@about' :
-                {
-                    template : 'Look I am a column!'
-                },
-
-                // for column two, we'll define a separate controller
-                'columnTwo@about' :
-                {
-                    templateUrl : 'app/about/table-data.html',
-                    controller : 'scotchController'
+                    templateUrl : 'app/about/about.html'
                 }
             }
         })
