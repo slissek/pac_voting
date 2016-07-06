@@ -19,13 +19,10 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 /**
  * Entity class for user votings.
- *
- * @author <a href="mailto:sven.lissek@prodyna.com">Sven Lissek</a>, <a href="http://www.prodyna.com">PRODYNA AG</a>
  */
 @Entity
 @Table(name = "user_votings")
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
-// @Document(indexName = "uservotings")
 public class UserVotings implements Serializable
 {
 

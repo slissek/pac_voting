@@ -14,9 +14,7 @@ import org.junit.runner.RunWith;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.IntegrationTest;
 import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -45,9 +43,6 @@ import com.prodyna.pac.voting.web.rest.dto.VoteDTO;
 @IntegrationTest
 public class VoteResourceIntTest
 {
-
-    private static final Long DEFAULT_VOTE_ID = 1L;
-    private static final Long UPDATED_VOTE_ID = 2L;
     private static final Long DEFAULT_CREATOR_ID = 1L;
     private static final Long UPDATED_CREATOR_ID = 2L;
     private static final boolean DEFAULT_USER_VOTED = false;
@@ -65,12 +60,6 @@ public class VoteResourceIntTest
 
     @Inject
     private UserVotingsService userVotingsService;
-
-    @Inject
-    private MappingJackson2HttpMessageConverter jacksonMessageConverter;
-
-    @Inject
-    private PageableHandlerMethodArgumentResolver pageableArgumentResolver;
 
     private MockMvc restVoteMockMvc;
 

@@ -23,13 +23,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * Entity class for vote options.
- *
- * @author <a href="mailto:sven.lissek@prodyna.com">Sven Lissek</a>, <a href="http://www.prodyna.com">PRODYNA AG</a>
  */
 @Entity
 @Table(name = "vote_options")
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
-// @Document(indexName = "voteoptions")
 public class VoteOption implements Serializable
 {
 

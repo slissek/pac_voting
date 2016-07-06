@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.codahale.metrics.annotation.Timed;
 import com.prodyna.pac.voting.domain.Authority;
 import com.prodyna.pac.voting.domain.User;
+import com.prodyna.pac.voting.exceptions.PermissionsDeniedException;
 import com.prodyna.pac.voting.repository.AuthorityRepository;
 import com.prodyna.pac.voting.security.AuthoritiesConstants;
 import com.prodyna.pac.voting.service.UserService;
@@ -53,7 +54,7 @@ public class UserResource
      * @param userDTO
      *            the user to create
      * @return the ResponseEntity with status 201 (Created) and with body the new user, or with status 400 (Bad Request) if the user has
-     *         already an ID
+     *         already an ID, or with status 403 (Forbidden) if the user is not an admin.
      * @throws URISyntaxException
      *             if the Location URI syntax is incorrect
      */
@@ -82,10 +83,17 @@ public class UserResource
         }
         else
         {
-            final User user = UserConverter.toEntity(userDTO, this.authorityRepository);
-            final ManagedUserDTO newUser = UserConverter.toDto(this.userService.save(user));
-            return ResponseEntity.created(new URI("/api/users/" + newUser.getId()))
-                    .headers(HeaderUtil.createEntityCreationAlert("userManagement", newUser.getId().toString())).body(newUser);
+            try
+            {
+                final User user = UserConverter.toEntity(userDTO, this.authorityRepository);
+                final ManagedUserDTO newUser = UserConverter.toDto(this.userService.save(user));
+                return ResponseEntity.created(new URI("/api/users/" + newUser.getId()))
+                        .headers(HeaderUtil.createEntityCreationAlert("userManagement", newUser.getId().toString())).body(newUser);
+            }
+            catch (final PermissionsDeniedException ex)
+            {
+                return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+            }
         }
     }
 
@@ -182,7 +190,7 @@ public class UserResource
      *
      * @param id
      *            the id of the user to delete
-     * @return the ResponseEntity with status 200 (OK)
+     * @return the ResponseEntity with status 200 (OK), or with status 403 (Forbidden) if the user is not an admin.
      */
     @RequestMapping(value = "/users/{id}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
@@ -191,8 +199,14 @@ public class UserResource
     {
         this.log.debug("REST request to delete User : {}", id);
 
-        this.userService.delete(id);
-        return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert("userManagement", id.toString())).build();
+        try
+        {
+            this.userService.delete(id);
+            return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert("userManagement", id.toString())).build();
+        }
+        catch (final PermissionsDeniedException ex)
+        {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
     }
-
 }

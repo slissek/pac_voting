@@ -9,6 +9,8 @@ import java.util.Set;
 import com.prodyna.pac.voting.domain.UserVotings;
 import com.prodyna.pac.voting.domain.Vote;
 import com.prodyna.pac.voting.domain.VoteOption;
+import com.prodyna.pac.voting.security.AuthoritiesConstants;
+import com.prodyna.pac.voting.security.SecurityUtils;
 import com.prodyna.pac.voting.service.UserService;
 import com.prodyna.pac.voting.service.UserVotingsService;
 import com.prodyna.pac.voting.web.rest.dto.VoteDTO;
@@ -50,11 +52,14 @@ public class VoteConverter
             }
         }
 
+        final boolean canEdit = SecurityUtils.isCurrentUserInRole(AuthoritiesConstants.ADMIN) || ((vote.getCreator() != null) && (vote.getCreator().getId() == currentUserId));
+
         final VoteDTO voteDTO = new VoteDTO();
         voteDTO.setId(voteId);
         voteDTO.setUserId(vote.getCreator() != null ? vote.getCreator().getId() : null);
         voteDTO.setTopic(vote.getTopic());
         voteDTO.setUserVoted(userVoted);
+        voteDTO.setCanEdit(canEdit);
 
         final Set<VoteOption> voteOptions = vote.getVoteOptions();
         final List<VoteOptionDTO> options = new ArrayList<VoteOptionDTO>(voteOptions.size());

@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.codahale.metrics.annotation.Timed;
 import com.prodyna.pac.voting.domain.User;
 import com.prodyna.pac.voting.domain.Vote;
+import com.prodyna.pac.voting.exceptions.PermissionsDeniedException;
 import com.prodyna.pac.voting.security.SecurityUtils;
 import com.prodyna.pac.voting.service.UserService;
 import com.prodyna.pac.voting.service.UserVotingsService;
@@ -55,8 +56,8 @@ public class VoteResource
      *
      * @param voteDTO
      *            the vote to create
-     * @return the ResponseEntity with status 201 (Created) and with body the new vote, or with status 400 (Bad Request) if the vote has
-     *         already an ID
+     * @return the ResponseEntity with status 201 (Created) and with body the new vote, with status 400 (Bad Request) if the vote has
+     *         already an ID, or with status 403 (Forbidden) if the user has no privileges to edit the vote.
      * @throws URISyntaxException
      *             if the Location URI syntax is incorrect
      */
@@ -71,12 +72,18 @@ public class VoteResource
             return ResponseEntity.badRequest()
                     .headers(HeaderUtil.createFailureAlert("vote", "idexists", "A new vote cannot already have an ID")).body(null);
         }
-
-        final Vote vote = VoteConverter.toEntity(voteDTO, this.userService);
-        final VoteDTO result = VoteConverter.toDto(this.getCurrentUserId(), this.voteService.save(vote), this.userVotingsService);
-        return ResponseEntity.created(new URI("/api/votes/" + result.getId()))
-                .headers(HeaderUtil.createEntityCreationAlert("vote", result.getId().toString()))
-                .body(result);
+        try
+        {
+            final Vote vote = VoteConverter.toEntity(voteDTO, this.userService);
+            final VoteDTO result = VoteConverter.toDto(this.getCurrentUserId(), this.voteService.save(vote), this.userVotingsService);
+            return ResponseEntity.created(new URI("/api/votes/" + result.getId()))
+                    .headers(HeaderUtil.createEntityCreationAlert("vote", result.getId().toString()))
+                    .body(result);
+        }
+        catch (final PermissionsDeniedException ex)
+        {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
     }
 
     /**
@@ -85,7 +92,8 @@ public class VoteResource
      * @param voteDTO
      *            the vote to update
      * @return the ResponseEntity with status 200 (OK) and with body the updated vote, or with status 400 (Bad Request) if the vote is not
-     *         valid, or with status 500 (Internal Server Error) if the vote couldnt be updated
+     *         valid, or with status 403 (Forbidden) if the user has no privileges to edit the vote, or with status 500 (Internal Server
+     *         Error) if the vote couldnt be updated
      * @throws URISyntaxException
      *             if the Location URI syntax is incorrect
      */
@@ -100,21 +108,28 @@ public class VoteResource
             return this.createVote(voteDTO);
         }
 
-        final Vote vote = this.voteService.findOne(voteDTO.getId());
-        if (vote != null)
+        try
         {
-            vote.setCreator(this.userService.getUserById(voteDTO.getUserId()));
-            vote.setTopic(voteDTO.getTopic());
-            vote.setVoteOptions(VoteOptionConverter.toEntitySet(voteDTO.getVoteOptions(), vote));
+            final Vote vote = this.voteService.findOne(voteDTO.getId());
+            if (vote != null)
+            {
+                vote.setCreator(this.userService.getUserById(voteDTO.getUserId()));
+                vote.setTopic(voteDTO.getTopic());
+                vote.setVoteOptions(VoteOptionConverter.toEntitySet(voteDTO.getVoteOptions(), vote));
 
-            final VoteDTO result = VoteConverter.toDto(this.getCurrentUserId(), this.voteService.save(vote), this.userVotingsService);
-            return ResponseEntity.ok()
-                    .headers(HeaderUtil.createEntityUpdateAlert("vote", voteDTO.getId().toString()))
-                    .body(result);
+                final VoteDTO result = VoteConverter.toDto(this.getCurrentUserId(), this.voteService.save(vote), this.userVotingsService);
+                return ResponseEntity.ok()
+                        .headers(HeaderUtil.createEntityUpdateAlert("vote", voteDTO.getId().toString()))
+                        .body(result);
+            }
+            else
+            {
+                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            }
         }
-        else
+        catch (final PermissionsDeniedException ex)
         {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
     }
 
@@ -168,15 +183,22 @@ public class VoteResource
      *
      * @param id
      *            the id of the vote to delete
-     * @return the ResponseEntity with status 200 (OK)
+     * @return the ResponseEntity with status 200 (OK), or with status 403 (Forbidden) if the user has no privileges to delete the vote.
      */
     @RequestMapping(value = "/votes/{id}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     public ResponseEntity<Void> deleteVote(@PathVariable final Long id)
     {
         this.log.debug("REST request to delete Vote : {}", id);
-        this.voteService.delete(id);
-        return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert("vote", id.toString())).build();
+        try
+        {
+            this.voteService.delete(id);
+            return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert("vote", id.toString())).build();
+        }
+        catch (final PermissionsDeniedException ex)
+        {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
     }
 
     private Long getCurrentUserId()

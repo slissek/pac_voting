@@ -26,8 +26,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * Entity class for user
- *
- * @author <a href="mailto:sven.lissek@prodyna.com">Sven Lissek</a>, <a href="http://www.prodyna.com">PRODYNA AG</a>
  */
 @Entity
 @Table(name = "users")

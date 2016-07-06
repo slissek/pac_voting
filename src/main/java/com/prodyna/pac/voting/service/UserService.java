@@ -3,6 +3,7 @@ package com.prodyna.pac.voting.service;
 import java.util.List;
 
 import com.prodyna.pac.voting.domain.User;
+import com.prodyna.pac.voting.exceptions.PermissionsDeniedException;
 
 /**
  * Service Interface for managing Users.
@@ -15,8 +16,10 @@ public interface UserService
      * @param userDTO
      *            the entity to save
      * @return the persisted entity
+     * @throws PermissionsDeniedException
+     *             if the current user is not an admin
      */
-    User save(User user);
+    User save(User user) throws PermissionsDeniedException;
 
     /**
      * Get all the users.
@@ -48,8 +51,10 @@ public interface UserService
      *
      * @param id
      *            the id of the entity
+     * @throws PermissionsDeniedException
+     *             if the current user is not an admin
      */
-    void delete(Long id);
+    void delete(Long id) throws PermissionsDeniedException;
 
     /**
      * Get the user with authorities

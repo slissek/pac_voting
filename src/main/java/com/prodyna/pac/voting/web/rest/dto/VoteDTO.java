@@ -18,6 +18,8 @@ public class VoteDTO
 
     private boolean userVoted;
 
+    private boolean canEdit;
+
     private List<VoteOptionDTO> voteOptions;
 
     public VoteDTO()
@@ -33,7 +35,8 @@ public class VoteDTO
     }
 
     /**
-     * @param id the id to set
+     * @param id
+     *            the id to set
      */
     public void setId(final Long id)
     {
@@ -49,7 +52,8 @@ public class VoteDTO
     }
 
     /**
-     * @param userId the userId to set
+     * @param userId
+     *            the userId to set
      */
     public void setUserId(final Long userId)
     {
@@ -65,7 +69,8 @@ public class VoteDTO
     }
 
     /**
-     * @param topic the topic to set
+     * @param topic
+     *            the topic to set
      */
     public void setTopic(final String topic)
     {
@@ -81,11 +86,29 @@ public class VoteDTO
     }
 
     /**
-     * @param userVoted the userVoted to set
+     * @param userVoted
+     *            the userVoted to set
      */
     public void setUserVoted(final boolean userVoted)
     {
         this.userVoted = userVoted;
+    }
+
+    /**
+     * @return the canEdit
+     */
+    public boolean isCanEdit()
+    {
+        return this.canEdit;
+    }
+
+    /**
+     * @param canEdit
+     *            the canEdit to set
+     */
+    public void setCanEdit(final boolean canEdit)
+    {
+        this.canEdit = canEdit;
     }
 
     /**
@@ -97,7 +120,8 @@ public class VoteDTO
     }
 
     /**
-     * @param voteOptions the voteOptions to set
+     * @param voteOptions
+     *            the voteOptions to set
      */
     public void setVoteOptions(final List<VoteOptionDTO> voteOptions)
     {

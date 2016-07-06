@@ -11,9 +11,9 @@
             </div>
         </div>
         <div class="table-responsive">
-            <div id="votes" ng-repeat="vote in vm.votes">
+            <div id="votes" ng-repeat="vote in vm.votes" class="col-md-7">
                 <h5>{{vote.topic}}</h5>
-                <div class="text-right" ng-if="vm.isEditAllowed(vote)">
+                <div class="text-right" ng-if="vote.canEdit">
                     <!-- Only if user is admin or creator-->
                     <button type="button" class="btn" ui-sref="home.edit({id:vote.id})">
                         <span class="glyphicon glyphicon-edit"></span>&nbsp;
@@ -27,14 +27,18 @@
                 </div>
                 <table class="table">
                     <tr id="options" ng-repeat="option in vote.voteOptions">
-                        <td>
+                        <td class="col-xs-1">
                             <input name="{{vote.id}}" type="radio" ng-model="option.userChoice" ng-value="true" ng-disabled="{{vote.userVoted==true}}" />
                         </td>
                         <td>
                             {{option.text}}
                         </td>
-                        <td>
-                            <div ng-if="vote.userVoted==true">{{option.percent}}%</div>
+                        <td class="col-xs-3">
+                            <div ng-if="vote.userVoted==true">
+                                <uib-progressbar min="0" max="100" value="option.percent">
+                                    <span>{{option.percent}}%</span>
+                                </uib-progressbar>
+                            </div>
                         </td>
                     </tr>
                 </table>

@@ -11,7 +11,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.prodyna.pac.voting.domain.User;
+import com.prodyna.pac.voting.exceptions.PermissionsDeniedException;
 import com.prodyna.pac.voting.repository.UserRepository;
+import com.prodyna.pac.voting.security.AuthoritiesConstants;
 import com.prodyna.pac.voting.security.SecurityUtils;
 import com.prodyna.pac.voting.service.UserService;
 
@@ -28,16 +30,23 @@ public class UserServiceImpl implements UserService
     private UserRepository userRepository;
 
     @Override
-    public User save(final User user)
+    public User save(final User user) throws PermissionsDeniedException
     {
-        final String encryptedPassword = new BCryptPasswordEncoder().encode(user.getPassword());
-        user.setPassword(encryptedPassword);
+        if (SecurityUtils.isCurrentUserInRole(AuthoritiesConstants.ADMIN))
+        {
+            final String encryptedPassword = new BCryptPasswordEncoder().encode(user.getPassword());
+            user.setPassword(encryptedPassword);
 
-        final User result = this.userRepository.save(user);
+            final User result = this.userRepository.save(user);
 
-        this.log.debug("Saved User: {}", result);
+            this.log.debug("Saved User: {}", result);
 
-        return result;
+            return result;
+        }
+        else
+        {
+            throw new PermissionsDeniedException();
+        }
     }
 
     @Override
@@ -67,14 +76,21 @@ public class UserServiceImpl implements UserService
     }
 
     @Override
-    public void delete(final Long id)
+    public void delete(final Long id) throws PermissionsDeniedException
     {
         this.log.debug("Request to delete User : {}", id);
-        final User user = this.userRepository.findOne(id);
-        if (user != null)
+        if (SecurityUtils.isCurrentUserInRole(AuthoritiesConstants.ADMIN))
         {
-            this.userRepository.delete(id);
-            this.log.debug("User deleted: {}", user);
+            final User user = this.userRepository.findOne(id);
+            if (user != null)
+            {
+                this.userRepository.delete(id);
+                this.log.debug("User deleted: {}", user);
+            }
+        }
+        else
+        {
+            throw new PermissionsDeniedException();
         }
     }
 

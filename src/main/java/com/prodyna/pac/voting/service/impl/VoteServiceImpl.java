@@ -10,7 +10,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.prodyna.pac.voting.domain.Vote;
+import com.prodyna.pac.voting.exceptions.PermissionsDeniedException;
 import com.prodyna.pac.voting.repository.VoteRepository;
+import com.prodyna.pac.voting.security.AuthoritiesConstants;
+import com.prodyna.pac.voting.security.SecurityUtils;
 import com.prodyna.pac.voting.service.UserVotingsService;
 import com.prodyna.pac.voting.service.VoteService;
 
@@ -30,30 +33,26 @@ public class VoteServiceImpl implements VoteService
     @Inject
     private UserVotingsService userVotingsService;
 
-    /**
-     * Save a vote.
-     *
-     * @param voteDTO
-     *            the entity to save
-     * @return the persisted entity
-     */
     @Override
-    public Vote save(final Vote vote)
+    public Vote save(final Vote vote) throws PermissionsDeniedException
     {
-        final Vote result = this.voteRepository.save(vote);
+        final boolean hasPermission = (vote.getId() == null)
+                || (vote.getCreator().getUserName().equalsIgnoreCase(SecurityUtils.getCurrentUserName())
+                        || SecurityUtils.isCurrentUserInRole(AuthoritiesConstants.ADMIN));
 
-        this.log.debug("Saved Vote : {}", vote);
-
-        return result;
+        if (hasPermission)
+        {
+            final Vote result = this.voteRepository.save(vote);
+            this.log.debug("Saved Vote : {}", vote);
+            return result;
+        }
+        else
+        {
+            this.log.debug("The current user has no priviliges to edit the vote: {}", vote);
+            throw new PermissionsDeniedException();
+        }
     }
 
-    /**
-     * Get all the votes.
-     *
-     * @param pageable
-     *            the pagination information
-     * @return the list of entities
-     */
     @Override
     @Transactional(readOnly = true)
     public List<Vote> getAll()
@@ -64,13 +63,6 @@ public class VoteServiceImpl implements VoteService
         return result;
     }
 
-    /**
-     * Get one vote by id.
-     *
-     * @param id
-     *            the id of the entity
-     * @return the entity
-     */
     @Override
     @Transactional(readOnly = true)
     public Vote findOne(final Long id)
@@ -80,21 +72,24 @@ public class VoteServiceImpl implements VoteService
         return vote;
     }
 
-    /**
-     * Delete the vote by id.
-     *
-     * @param id
-     *            the id of the entity
-     */
     @Override
-    public void delete(final Long id)
+    public void delete(final Long id) throws PermissionsDeniedException
     {
         this.log.debug("Request to delete Vote : {}", id);
         final Vote vote = this.voteRepository.findOne(id);
         if (vote != null)
         {
-            this.voteRepository.delete(id);
-            this.log.debug("Vote deleted: {}", vote);
+            if (vote.getCreator().getUserName().equalsIgnoreCase(SecurityUtils.getCurrentUserName())
+                    || SecurityUtils.isCurrentUserInRole(AuthoritiesConstants.ADMIN))
+            {
+                this.voteRepository.delete(id);
+                this.log.debug("Vote deleted: {}", vote);
+            }
+            else
+            {
+                this.log.debug("The current user has no priviliges to delete the vote: {}", vote);
+                throw new PermissionsDeniedException();
+            }
         }
     }
 }
