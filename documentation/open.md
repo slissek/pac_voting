@@ -21,3 +21,7 @@ Add a testframework like Karma to establish user front-end testing and add test 
 ## Adding a code coverage tool
 
 Understanding the test code coverage and optimize your code style by using a code coverage tool like sonar. Integrate it with its maven plugin into the maven build.
+
+## Integrate liquibase
+
+This tool would be very helpful creating and managing our database schema and default data.
