@@ -55,3 +55,18 @@ voting:
             key: 62bf4948d723ea2c8629193b87069d216ff898b3
     metrics: # DropWizard Metrics configuration, used by MetricsConfiguration
         jmx.enabled: true
+        spark:
+            enabled: false
+            host: localhost
+            port: 9999
+        graphite:
+            enabled: false
+            host: localhost
+            port: 2003
+            prefix: slissek-pac
+    swagger: # swagger is enabled. It can be disabled by pasing 'no-swagger' profile at run time as well
+        title: VotingApp API
+        description: VotingApp API documentation
+        version: 1.0.0
+        enabled: true
+

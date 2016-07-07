@@ -118,8 +118,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter
         .and()
             .authorizeRequests()
             .antMatchers("/api/authenticate").permitAll()
+            .antMatchers("/api/profile-info").permitAll()
+            .antMatchers("/api/**").authenticated()
             .antMatchers("/management/**").hasAuthority(AuthoritiesConstants.ADMIN)
-            .antMatchers("/api/**").authenticated();
+            .antMatchers("/v2/api-docs/**").permitAll()
+            .antMatchers("/swagger-ui/index.html").hasAuthority(AuthoritiesConstants.ADMIN);
     }
     // @formatter:on
 

@@ -1,17 +1,22 @@
+######################
+# Project Specific
+######################
+/target/www/**
 
-# Created by https://www.gitignore.io/api/eclipse,java
-
-### Eclipse ###
+######################
+# Eclipse
+######################
 
 .metadata
-bin/
-tmp/
+bin/**
+tmp/**
 *.tmp
 *.bak
 *.swp
 *~.nib
 local.properties
-.settings/
+.settings/**
+.classpath
 .loadpath
 .recommenders
 
@@ -55,13 +60,14 @@ local.properties
 .recommenders/
 
 
-### Java ###
+######################
+# Java
+######################
 *.class
 
-# Mobile Tools for Java (J2ME)
-.mtj.tmp/
-
-# Package Files #
+######################
+# Package Files
+######################
 *.jar
 *.war
 *.ear
@@ -69,3 +75,44 @@ local.properties
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 /target/
+
+######################
+# Maven
+######################
+/log/**
+/target/**
+
+######################
+# Windows
+######################
+# Windows image file caches
+Thumbs.db
+
+# Folder config file
+Desktop.ini
+
+######################
+# Mac OSX
+######################
+.DS_Store
+.svn
+
+# Thumbnails
+._*
+
+# Files that might appear on external disk
+.Spotlight-V100
+.Trashes
+
+######################
+# Directories
+######################
+/build/**
+/bin/**
+/spring_loaded/**
+/deploy/**
+
+######################
+# Logs
+######################
+*.log

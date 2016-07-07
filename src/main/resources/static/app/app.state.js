@@ -292,6 +292,19 @@
             }
         })
 
+        .state('docs', {
+            parent: 'admin',
+            url: '/docs',
+            data: {
+                authorities: ['ROLE_ADMIN'],
+            },
+            views: {
+                'content@': {
+                    templateUrl: 'app/admin/docs/docs.html'
+                }
+            }
+        })
+        
         // ABOUT PAGE AND MULTIPLE NAMED VIEWS
         .state('about',
         {
