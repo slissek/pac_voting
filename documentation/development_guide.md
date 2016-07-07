@@ -17,7 +17,7 @@ Please install a Java JDK 1.8.x and set the *JAVA_HOME* environment variable and
 
 ### Database
 
-Please install and connect to the PostgreSQL database as root and copy the content of the database setup script located at: */configuration/prepare_database.sql* and execute all commands. Please check if a new user: *pac_app* and a database *pac* were created. The *pac_app*-user must have the ownership of the database. The database should contain the the following tables:
+Please install the PostgreSQL database using the default port and connect to it as root after that. Open a SQL console and copy the content of the database setup script located at: */configuration/prepare_database.sql* and execute all commands sequentially. Please check if a new user: *pac_app* and a database *pac* were created. The *pac_app*-user must have the ownership of the database. The database should contain the the following tables:
 
 ![Database Model](./resources/dbmodel.tiff)
 

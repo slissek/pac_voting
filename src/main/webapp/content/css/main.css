@@ -1,0 +1,64 @@
+/* ==========================================================================
+ Sticky footer styles
+ ==========================================================================*/
+-------------------------------------------------- */
+html {
+  position: relative;
+  min-height: 100%;
+}
+body {
+  /* Margin bottom by footer height */
+  margin-bottom: 60px;
+}
+.footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  /* Set the fixed height of the footer here */
+  height: 40px;
+  background-color: #f5f5f5;
+}
+
+
+/* ==========================================================================
+ui bootstrap adaptions
+========================================================================== */
+@media (min-width: 768px) {
+  .navbar-left {
+    float: left !important; 
+   }
+  .navbar-right {
+    float: right !important;
+    margin-right: 5px !important; 
+   }
+   .navbar-right ~ .navbar-right {
+      margin-right: 0; 
+   } 
+}
+
+.alert-warning .alert-link {
+    color: #286fb1;
+}
+
+h5, .h5 .warning {
+        color : red;
+    }
+}
+
+/* ==========================================================================
+Hide ng-cloak on page load, https://docs.angularjs.org/api/ng/directive/ngCloak
+========================================================================== */
+[ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
+    display: none !important;
+}
+
+/* ==========================================================================
+make sure browsers use the pointer cursor for anchors, even with no href
+========================================================================== */
+a:hover {
+  cursor: pointer;
+}
+
+.hand {
+    cursor: pointer;
+}
