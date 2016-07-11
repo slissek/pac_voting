@@ -4,6 +4,113 @@ Please have a look into the [Architecture overview](./architecture_overview.md) 
 
 The following sections cover the configuration of your local environment and the development process itself. 
 
+## Development
+
+The following sections should introduce you to the development approaches and describe the structure of the project.
+
+### Definition of done
+
+An enhancement of the project is **done** if the following rules are fulfilled:
+* the code compiles
+* the code is commented
+* tests are created or adjusted
+* all tests passing
+* the build finishes successfully
+* this documentation is updated 
+
+### Server
+
+The project is setup as a Maven project and structured as follows:
+
+└── pom.xml
+    ├── src/main/java       <- spring boot application code
+    ├── src/main/resources  <- configuration files
+    ├── src/main/test       <- unit tests
+    ├── src/main/assembly   <- configuration for the Maven assembly task 
+    ├── configuration       <- files to setup the (development) environment
+    ├── documentation       <- documentation
+    └── target              <- build target
+
+The spring boot application code is organized in a clear package structure with following focus:
+
+└── src/main/java
+    └── com.prodyna.pac.voting
+        ├── config                  <- configuration files of the application - configured via application.yml
+        ├── domain                  <- the entities
+        ├── exceptions              <- package for custom exceptions
+        ├── repository              <- the persistence layer
+        ├── security                <- security related handler, services, constants and utilities
+        ├── service                 <- the business layer
+        ├── web                     <- the presentation layer
+        └── VotingApplication.java  <- the main application 
+
+The following naming conventions should be followed for further enhancements:
+* classes / interfaces:
+    * the service interface is named like UserService
+    * the implementations should use **Impl** as name suffix, e.g. UserServiceImpl
+    * Configuration-, Repository-, Service-, Resource-, Converter and Tests should use their function as name suffix
+* objects
+    * entities should be named like their corresponding database table (camcelCase replacing "_" delimiter)
+    * DTOs should be added as suffix to each data transfer object
+* method names
+    * reading method returning one object start with **get**
+    * reading method returning a list of objects starts with **find**
+    * create / update a object should named **save**
+    * delete a object should named **delete**
+
+### Client
+
+To become familiar with the client application, it is recommended to read the following guides and concepts first before you start to develop new features.
+* The AngularJs frontend follows the [AngularJS style guide](https://github.com/johnpapa/angular-styleguide/blob/master/a1/README.md). This guide is endorsed by the AngularJS Team, and gives the guarantee to have a clear update path to AngularJS 2.
+* The client uses (angular-ui-router)[https://angular-ui.github.io/ui-router/] to add routing to the application.
+* Alerts and progress bars from (UI Bootstrap)[https://angular-ui.github.io/bootstrap/] are used in the client
+
+The client code is currently located within the spring boot application and structured as follows:
+
+└── src/main/webapp
+    ├── app                     <- the AngularJS application root
+    │   ├── about               <- the about conent
+    │   ├── admin               <- the administration area
+    │   │   ├── configuration
+    │   │   ├── docs
+    │   │   ├── health
+    │   │   ├── metrics
+    │   │   └── user-management
+    │   ├── components          <- cross sectional parts
+    │   │   ├── alert
+    │   │   ├── error
+    │   │   ├── login
+    │   │   ├── logout
+    │   │   └── navbar
+    │   ├── config
+    │   ├── home                <- the application home
+    │   ├── interceptor         <- app interceptors
+    │   ├── services            <- services used across the application 
+    │   │   ├── auth
+    │   │   ├── profiles
+    │   │   ├── user
+    │   │   ├── votes
+    │   ├── votes               <- the votes area
+    ├── bower_components        <- necessary application dependency files - controlled by bower
+    ├── content                 <- fonts and styling
+    │   ├── css
+    │   ├── fonts
+    ├── swagger-ui              <- swagger-ui iframe-root
+    ├── 404.html
+    └── index.html              <- application root html
+
+## Tests
+
+### Server
+
+Tests are done with the Spring Test Context framework, and are located in the *src/test/java* folder. It is recommended that you have a test class for every rest resource, service and converter. To be able to focus the test on the class implementation, it is best practice to use [Mockito](http://mockito.org) to mock e.g. a service or a repository.
+
+The package structure of the tests should copy their implementation counterparts.
+
+### Client
+
+Tests for the frontend are still on the TODO list, therefore we could not provide much information here.
+
 ## Setup
 
 ### Source Code Repository
@@ -97,38 +204,3 @@ Eclipse menu "Window" > "Preferences" search for "Save Actions" for Java > Edito
 Within the workspace, a folder configuration is provided which contains formatter files. Import them as follows:
 - Eclipse menu "Window" > "Preferences" > "Java" > "Code Style" > "Formatter"
 - Eclipse menu "Window" > "Preferences" > "JavaScript" > "Code Style" > "Formatter"
-
-## Development
-
-The following sections should introduce you to the development approaches and describe the structure of the project.
-
-### Definition of done
-
-An enhancement of the project is **done** if the following rules are fulfilled:
-* the code compiles
-* the code is commented
-* tests are created or adjusted
-* all tests passing
-* the build finishes successfully
-* this documentation is updated 
-
-### Server
-
-### Client
-
-To become familiar with the client application, it is recommended to read the following guides and concepts first before you start to develop new features.
-* The AngularJs frontend follows the [AngularJS style guide](https://github.com/johnpapa/angular-styleguide/blob/master/a1/README.md). This guide is endorsed by the AngularJS Team, and gives the guarantee to have a clear update path to AngularJS 2.
-* The client uses (angular-ui-router)[https://angular-ui.github.io/ui-router/] to add routing to the application.
-* Alerts and progress bars from (UI Bootstrap)[https://angular-ui.github.io/bootstrap/] are used in the client
-
-## Tests
-
-### Server
-
-Tests are done with the Spring Test Context framework, and are located in the *src/test/java* folder. It is recommended that you have a test class for every rest resource, service and converter. To be able to focus the test on the class implementation, it is best practice to use [Mockito](http://mockito.org) to mock e.g. a service or a repository.
-
-
-
-### Client
-
-Tests for the frontend are still on the TODO list, therefore we could not provide much information here.
