@@ -15,6 +15,8 @@ public interface UserVotingsRepository extends JpaRepository<UserVotings,Long> {
 
     List<UserVotings> findByVoteId(Long voteId);
 
+    List<UserVotings> findByVoteOptionsId(Long voteOptionsId);
+
     List<UserVotings> findByUserIdAndVoteId(Long userId, Long voteId);
 
     Long countByVoteId(Long voteId);

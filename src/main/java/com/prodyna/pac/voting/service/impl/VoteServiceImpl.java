@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.prodyna.pac.voting.domain.UserVotings;
 import com.prodyna.pac.voting.domain.Vote;
 import com.prodyna.pac.voting.exceptions.PermissionsDeniedException;
 import com.prodyna.pac.voting.repository.VoteRepository;
@@ -87,6 +88,14 @@ public class VoteServiceImpl implements VoteService
             {
                 this.voteRepository.delete(id);
                 this.log.debug("Vote deleted: {}", vote);
+
+                final List<UserVotings> userVotingsByVoteId = this.userVotingsService.findByVoteId(id);
+                for (final UserVotings userVotings : userVotingsByVoteId)
+                {
+                    final Long userVotingId = userVotings.getId();
+                    this.log.debug("Request to delete UserVoting : {}", userVotingId);
+                    this.userVotingsService.delete(userVotingId);
+                }
             }
             else
             {

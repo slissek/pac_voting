@@ -54,6 +54,15 @@ public interface UserVotingsService
     List<UserVotings> findByVoteId(Long voteId);
 
     /**
+     * Get all the userVotings for given voteOptionsId
+     *
+     * @param voteOptionsId
+     *            the voteOptionsId to use
+     * @return the list of entities
+     */
+    List<UserVotings> findByVoteOptionsId(Long voteOptionsId);
+
+    /**
      * Get all the userVotings for given userId and voteId
      *
      * @param userId

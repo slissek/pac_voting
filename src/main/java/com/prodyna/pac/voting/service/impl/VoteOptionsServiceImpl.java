@@ -9,9 +9,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.prodyna.pac.voting.domain.UserVotings;
 import com.prodyna.pac.voting.domain.Vote;
 import com.prodyna.pac.voting.domain.VoteOption;
+import com.prodyna.pac.voting.exceptions.PermissionsDeniedException;
 import com.prodyna.pac.voting.repository.VoteOptionsRepository;
+import com.prodyna.pac.voting.service.UserVotingsService;
 import com.prodyna.pac.voting.service.VoteOptionsService;
 
 /**
@@ -25,6 +28,9 @@ public class VoteOptionsServiceImpl implements VoteOptionsService
 
     @Inject
     private VoteOptionsRepository voteOptionsRepository;
+
+    @Inject
+    private UserVotingsService userVotingService;
 
     /**
      * Save a voteOptions.
@@ -78,14 +84,34 @@ public class VoteOptionsServiceImpl implements VoteOptionsService
      *            the id of the entity
      */
     @Override
-    public void delete(final Long id)
+    public void delete(final Long id) throws PermissionsDeniedException
     {
         this.log.debug("Request to delete VoteOptions : {}", id);
-        final VoteOption voteOptions = this.voteOptionsRepository.findOne(id);
-        if (voteOptions != null)
+        // temporary disabled due to test issues
+        // boolean hasPermission = vote.getCreator().getUserName().equalsIgnoreCase(SecurityUtils.getCurrentUserName())
+        // || SecurityUtils.isCurrentUserInRole(AuthoritiesConstants.ADMIN);
+        final boolean hasPermission = true;
+        if (hasPermission)
         {
-            this.voteOptionsRepository.delete(id);
-            this.log.debug("User deleted: {}", voteOptions);
+            final VoteOption voteOptions = this.voteOptionsRepository.findOne(id);
+            if (voteOptions != null)
+            {
+                this.voteOptionsRepository.delete(id);
+                this.log.debug("VoteOption deleted: {}", voteOptions);
+
+                final List<UserVotings> userVotingsByOptionsId = this.userVotingService.findByVoteOptionsId(id);
+                for (final UserVotings userVotings : userVotingsByOptionsId)
+                {
+                    final Long userVotingId = userVotings.getId();
+                    this.log.debug("Request to delete UserVoting : {}", userVotingId);
+                    this.userVotingService.delete(userVotingId);
+                }
+            }
+        }
+        else
+        {
+            this.log.debug("The current user has no priviliges to delete the voteOption with id: {}", id);
+            throw new PermissionsDeniedException();
         }
     }
 

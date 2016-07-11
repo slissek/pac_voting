@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.prodyna.pac.voting.domain.Vote;
 import com.prodyna.pac.voting.domain.VoteOption;
+import com.prodyna.pac.voting.exceptions.PermissionsDeniedException;
 
 /**
  * Service Interface for managing VoteOptions.
@@ -51,6 +52,6 @@ public interface VoteOptionsService
      * @param id
      *            the id of the entity
      */
-    void delete(Long id);
+    void delete(Long id) throws PermissionsDeniedException;
 
 }

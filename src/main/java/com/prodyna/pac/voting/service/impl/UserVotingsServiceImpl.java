@@ -105,6 +105,14 @@ public class UserVotingsServiceImpl implements UserVotingsService
     }
 
     @Override
+    public List<UserVotings> findByVoteOptionsId(final Long voteOptionsId)
+    {
+        this.log.debug("Request to get UserVotings by voteOptionsID: {}", voteOptionsId);
+        final List<UserVotings> userVotings = this.userVotingsRepository.findByVoteOptionsId(voteOptionsId);
+        return userVotings;
+    }
+
+    @Override
     public List<UserVotings> findByUserIdAndVoteId(final Long userId, final Long voteId)
     {
         this.log.debug("Request to get UserVotings by userId and voteID: {}", userId, voteId);

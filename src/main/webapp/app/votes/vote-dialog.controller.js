@@ -4,9 +4,9 @@
 
     angular.module('VotingApp').controller('VoteDialogController', VoteDialogController);
 
-    VoteDialogController.$inject = ['$uibModalInstance', 'Principal', 'Votes', 'entity'];
+    VoteDialogController.$inject = ['$uibModalInstance', 'Principal', 'Votes', 'VoteOptions', 'entity'];
 
-    function VoteDialogController($uibModalInstance, Principal, Votes, entity)
+    function VoteDialogController($uibModalInstance, Principal, Votes, VoteOptions, entity)
     {
         var vm = this;
 
@@ -46,6 +46,11 @@
                 vm.vote.voteOptions.splice(vm.vote.voteOptions.indexOf(option), 1);
             }
             vm.voteOption.newOption = {id: null, text:''}
+
+            if (option.id !== null) 
+            {
+                VoteOptions.delete({id: option.id});
+            }
         }
 
         function onSaveSuccess (result) {

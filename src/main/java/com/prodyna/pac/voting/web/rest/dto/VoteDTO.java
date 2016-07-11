@@ -1,3 +1,4 @@
+
 package com.prodyna.pac.voting.web.rest.dto;
 
 import java.util.List;
