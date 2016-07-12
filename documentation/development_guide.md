@@ -22,27 +22,27 @@ An enhancement of the project is **done** if the following rules are fulfilled:
 
 The project is setup as a Maven project and structured as follows:
 
-└── pom.xml
-    ├── src/main/java       <- spring boot application code
-    ├── src/main/resources  <- configuration files
-    ├── src/main/test       <- unit tests
-    ├── src/main/assembly   <- configuration for the Maven assembly task 
-    ├── configuration       <- files to setup the (development) environment
-    ├── documentation       <- documentation
-    └── target              <- build target
+    └── pom.xml
+        ├── src/main/java       <- spring boot application code
+        ├── src/main/resources  <- configuration files
+        ├── src/main/test       <- unit tests
+        ├── src/main/assembly   <- configuration for the Maven assembly task 
+        ├── configuration       <- files to setup the (development) environment
+        ├── documentation       <- documentation
+        └── target              <- build target
 
 The spring boot application code is organized in a clear package structure with following focus:
 
-└── src/main/java
-    └── com.prodyna.pac.voting
-        ├── config                  <- configuration files of the application - configured via application.yml
-        ├── domain                  <- the entities
-        ├── exceptions              <- package for custom exceptions
-        ├── repository              <- the persistence layer
-        ├── security                <- security related handler, services, constants and utilities
-        ├── service                 <- the business layer
-        ├── web                     <- the presentation layer
-        └── VotingApplication.java  <- the main application 
+    └── src/main/java
+        └── com.prodyna.pac.voting
+            ├── config                  <- configuration files of the application - configured via application.yml
+            ├── domain                  <- the entities
+            ├── exceptions              <- package for custom exceptions
+            ├── repository              <- the persistence layer
+            ├── security                <- security related handler, services, constants and utilities
+            ├── service                 <- the business layer
+            ├── web                     <- the presentation layer
+            └── VotingApplication.java  <- the main application 
 
 The following naming conventions should be followed for further enhancements:
 * classes / interfaces:
@@ -67,37 +67,37 @@ To become familiar with the client application, it is recommended to read the fo
 
 The client code is currently located within the spring boot application and structured as follows:
 
-└── src/main/webapp
-    ├── app                     <- the AngularJS application root
-    │   ├── about               <- the about conent
-    │   ├── admin               <- the administration area
-    │   │   ├── configuration
-    │   │   ├── docs
-    │   │   ├── health
-    │   │   ├── metrics
-    │   │   └── user-management
-    │   ├── components          <- cross sectional parts
-    │   │   ├── alert
-    │   │   ├── error
-    │   │   ├── login
-    │   │   ├── logout
-    │   │   └── navbar
-    │   ├── config
-    │   ├── home                <- the application home
-    │   ├── interceptor         <- app interceptors
-    │   ├── services            <- services used across the application 
-    │   │   ├── auth
-    │   │   ├── profiles
-    │   │   ├── user
-    │   │   ├── votes
-    │   ├── votes               <- the votes area
-    ├── bower_components        <- necessary application dependency files - controlled by bower
-    ├── content                 <- fonts and styling
-    │   ├── css
-    │   ├── fonts
-    ├── swagger-ui              <- swagger-ui iframe-root
-    ├── 404.html
-    └── index.html              <- application root html
+    └── src/main/webapp
+        ├── app                     <- the AngularJS application root
+        │   ├── about               <- the about conent
+        │   ├── admin               <- the administration area
+        │   │   ├── configuration
+        │   │   ├── docs
+        │   │   ├── health
+        │   │   ├── metrics
+        │   │   └── user-management
+        │   ├── components          <- cross sectional parts
+        │   │   ├── alert
+        │   │   ├── error
+        │   │   ├── login
+        │   │   ├── logout
+        │   │   └── navbar
+        │   ├── config
+        │   ├── home                <- the application home
+        │   ├── interceptor         <- app interceptors
+        │   ├── services            <- services used across the application 
+        │   │   ├── auth
+        │   │   ├── profiles
+        │   │   ├── user
+        │   │   ├── votes
+        │   ├── votes               <- the votes area
+        ├── bower_components        <- necessary application dependency files - controlled by bower
+        ├── content                 <- fonts and styling
+        │   ├── css
+        │   ├── fonts
+        ├── swagger-ui              <- swagger-ui iframe-root
+        ├── 404.html
+        └── index.html              <- application root html
 
 ## Tests
 
