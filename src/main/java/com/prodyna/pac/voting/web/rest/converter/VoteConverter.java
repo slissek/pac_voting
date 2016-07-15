@@ -52,7 +52,8 @@ public class VoteConverter
             }
         }
 
-        final boolean canEdit = SecurityUtils.isCurrentUserInRole(AuthoritiesConstants.ADMIN) || ((vote.getCreator() != null) && (vote.getCreator().getId() == currentUserId));
+        final boolean canEdit = SecurityUtils.isCurrentUserInRole(AuthoritiesConstants.ADMIN)
+                || ((vote.getCreator() != null) && (vote.getCreator().getId().equals(currentUserId)));
 
         final VoteDTO voteDTO = new VoteDTO();
         voteDTO.setId(voteId);

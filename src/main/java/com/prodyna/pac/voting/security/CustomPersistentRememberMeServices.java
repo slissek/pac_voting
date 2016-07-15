@@ -136,7 +136,7 @@ public class CustomPersistentRememberMeServices extends AbstractRememberMeServic
                 this.log.error("Failed to save persistent token ", e);
             }
         }else {
-            new UsernameNotFoundException("User " + userName + " was not found in the database");
+            throw new UsernameNotFoundException("User " + userName + " was not found in the database");
         }
     }
 

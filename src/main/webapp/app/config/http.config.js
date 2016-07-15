@@ -16,7 +16,9 @@
         // Cache everything except rest api requests
         httpRequestInterceptorCacheBusterProvider.setMatchlist([/.*api.*/, /.*protected.*/ ], true);
 
+        $httpProvider.interceptors.push('errorHandlerInterceptor');
 //        $httpProvider.interceptors.push('authExpiredInterceptor');
+        $httpProvider.interceptors.push('notificationInterceptor');
 
         $urlMatcherFactoryProvider.type('boolean',
         {

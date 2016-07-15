@@ -47,23 +47,23 @@ The spring boot application code is organized in a clear package structure with 
 The following naming conventions should be followed for further enhancements:
 * classes / interfaces:
     * the service interface is named like UserService
-    * the implementations should use **Impl** as name suffix, e.g. UserServiceImpl
+    * the implementations should use *Impl* as name suffix, e.g. UserServiceImpl
     * Configuration-, Repository-, Service-, Resource-, Converter and Tests should use their function as name suffix
 * objects
     * entities should be named like their corresponding database table (camcelCase replacing "_" delimiter)
     * DTOs should be added as suffix to each data transfer object
 * method names
-    * reading method returning one object start with **get**
-    * reading method returning a list of objects starts with **find**
-    * create / update a object should named **save**
-    * delete a object should named **delete**
+    * reading method returning one object start with *get*
+    * reading method returning a list of objects starts with *find*
+    * create / update a object should named *save*
+    * delete a object should named *delete*
 
 ### Client
 
 To become familiar with the client application, it is recommended to read the following guides and concepts first before you start to develop new features.
-* The AngularJs frontend follows the [AngularJS style guide](https://github.com/johnpapa/angular-styleguide/blob/master/a1/README.md). This guide is endorsed by the AngularJS Team, and gives the guarantee to have a clear update path to AngularJS 2.
-* The client uses (angular-ui-router)[https://angular-ui.github.io/ui-router/] to add routing to the application.
-* Alerts and progress bars from (UI Bootstrap)[https://angular-ui.github.io/bootstrap/] are used in the client
+* The AngularJs frontend follows the [AngularJS style guide](https://github.com/johnpapa/angular-styleguide/blob/master/a1/README.md) . This guide is endorsed by the AngularJS Team, and gives the guarantee to have a clear update path to AngularJS 2.
+* The client uses (angular-ui-router)[https://angular-ui.github.io/ui-router] to add routing to the application.
+* Alerts and progress bars from (UI Bootstrap)[https://angular-ui.github.io/bootstrap] are used in the client
 
 The client code is currently located within the spring boot application and structured as follows:
 

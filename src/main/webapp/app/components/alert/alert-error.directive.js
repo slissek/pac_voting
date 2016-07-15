@@ -49,10 +49,11 @@
                 case 400:
                     var errorHeader = httpResponse.headers('X-VotingApp-error');
                     var entityKey = httpResponse.headers('X-VotingApp-params');
+                    var defaultMessage = httpResponse.headers('X-VotingApp-msg');
                     if (errorHeader)
                     {
                         var entityName = 'global.menu.entities.' + entityKey;
-                        addErrorAlert(errorHeader, errorHeader,
+                        addErrorAlert(errorHeader, defaultMessage,
                         {
                             entityName : entityName
                         });

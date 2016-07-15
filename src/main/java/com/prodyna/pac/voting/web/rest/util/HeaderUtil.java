@@ -1,5 +1,7 @@
 package com.prodyna.pac.voting.web.rest.util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 
 /**
@@ -8,6 +10,8 @@ import org.springframework.http.HttpHeaders;
  */
 public class HeaderUtil
 {
+    private static final Logger log = LoggerFactory.getLogger(HeaderUtil.class);
+
     public static HttpHeaders createAlert(final String message, final String param)
     {
         final HttpHeaders headers = new HttpHeaders();
@@ -33,9 +37,12 @@ public class HeaderUtil
 
     public static HttpHeaders createFailureAlert(final String entityName, final String errorKey, final String defaultMessage)
     {
+        log.error("Entity creation failed, {}", defaultMessage);
+
         final HttpHeaders headers = new HttpHeaders();
         headers.add("X-VotingApp-error", "error." + errorKey);
         headers.add("X-VotingApp-params", entityName);
+        headers.add("X-VotingApp-msg", defaultMessage);
         return headers;
     }
 }
