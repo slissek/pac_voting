@@ -1,15 +1,19 @@
 package com.prodyna.pac.voting.web.rest;
 
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
-import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Sort;
+import org.springframework.hateoas.Link;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -55,7 +59,7 @@ public class UserVotingsResource
             throws URISyntaxException
     {
         this.log.debug("REST request to save UserVotings : {}", userVotingsDTO);
-        if (userVotingsDTO.getId() != null)
+        if (userVotingsDTO.getIdentifier() != null)
         {
             return ResponseEntity.badRequest()
                     .headers(HeaderUtil.createFailureAlert("userVotings", "idexists", "A new userVotings cannot already have an ID"))
@@ -64,7 +68,7 @@ public class UserVotingsResource
         // Check if user already voted
         final List<UserVotings> findByUserIdAndVoteId = this.userVotingsService.findByUserIdAndVoteId(userVotingsDTO.getUserId(),
                 userVotingsDTO.getVoteId());
-        if ((findByUserIdAndVoteId != null) && (findByUserIdAndVoteId.size() != 0))
+        if ((findByUserIdAndVoteId != null) && (!findByUserIdAndVoteId.isEmpty()))
         {
             return ResponseEntity.badRequest()
                     .headers(HeaderUtil.createFailureAlert("userVotings", "useralreadyvoted", "The user already voted this vote"))
@@ -73,8 +77,9 @@ public class UserVotingsResource
 
         final UserVotings userVotings = UserVotingsConverter.toEntity(userVotingsDTO);
         final UserVotingsDTO result = UserVotingsConverter.toDto(this.userVotingsService.save(userVotings));
-        return ResponseEntity.created(new URI("/api/user-votings/" + result.getId()))
-                .headers(HeaderUtil.createEntityCreationAlert("userVotings", result.getId().toString()))
+        result.add(UserVotingsResource.createLinktToSelf(result.getIdentifier()));
+        return ResponseEntity.created(new URI("/api/user-votings/" + result.getIdentifier()))
+                .headers(HeaderUtil.createEntityCreationAlert("userVotings", result.getIdentifier().toString()))
                 .body(result);
     }
 
@@ -94,12 +99,13 @@ public class UserVotingsResource
             throws URISyntaxException
     {
         this.log.debug("REST request to update UserVotings : {}", userVotingsDTO);
-        if (userVotingsDTO.getId() == null)
+        if (userVotingsDTO.getIdentifier() == null)
         {
             return this.createUserVotings(userVotingsDTO);
         }
         final UserVotings userVotings = UserVotingsConverter.toEntity(userVotingsDTO);
         final UserVotingsDTO result = UserVotingsConverter.toDto(this.userVotingsService.save(userVotings));
+        result.add(UserVotingsResource.createLinktToSelf(result.getIdentifier()));
         return ResponseEntity.ok()
                 .headers(HeaderUtil.createEntityUpdateAlert("userVotings", userVotings.getId().toString()))
                 .body(result);
@@ -115,7 +121,9 @@ public class UserVotingsResource
     public List<UserVotingsDTO> getAllUserVotings()
     {
         this.log.debug("REST request to get all UserVotings");
-        return UserVotingsConverter.toDtoList(this.userVotingsService.findAll());
+        final List<UserVotingsDTO> userVotings = UserVotingsConverter.toDtoList(this.userVotingsService.findAll(new Sort(Sort.Direction.ASC, "id")));
+        userVotings.stream().forEach(userVoting -> userVoting.add(UserVotingsResource.createLinktToSelf(userVoting.getIdentifier())));
+        return userVotings;
     }
 
     /**
@@ -127,15 +135,20 @@ public class UserVotingsResource
      */
     @RequestMapping(value = "/user-votings/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<UserVotings> getUserVotings(@PathVariable final Long id)
+    public ResponseEntity<UserVotingsDTO> getUserVotings(@PathVariable final Long id)
     {
         this.log.debug("REST request to get UserVotings : {}", id);
         final UserVotings userVotings = this.userVotingsService.findOne(id);
-        return Optional.ofNullable(userVotings)
-                .map(result -> new ResponseEntity<>(
-                        result,
-                        HttpStatus.OK))
-                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        if (userVotings != null)
+        {
+            final UserVotingsDTO userVotingsDTO = UserVotingsConverter.toDto(userVotings);
+            userVotingsDTO.add(UserVotingsResource.createLinktToSelf(userVotingsDTO.getIdentifier()));
+            return new ResponseEntity<>(userVotingsDTO, HttpStatus.OK);
+        }
+        else
+        {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
     /**
@@ -152,5 +165,10 @@ public class UserVotingsResource
         this.log.debug("REST request to delete UserVotings : {}", id);
         this.userVotingsService.delete(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert("userVotings", id.toString())).build();
+    }
+
+    public static Link createLinktToSelf(final Long id)
+    {
+        return linkTo(methodOn(UserVotingsResource.class).getUserVotings(id)).withSelfRel();
     }
 }

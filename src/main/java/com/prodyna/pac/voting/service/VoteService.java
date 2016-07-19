@@ -2,6 +2,8 @@ package com.prodyna.pac.voting.service;
 
 import java.util.List;
 
+import org.springframework.data.domain.Sort;
+
 import com.prodyna.pac.voting.domain.Vote;
 import com.prodyna.pac.voting.exceptions.PermissionsDeniedException;
 
@@ -29,7 +31,7 @@ public interface VoteService
      *
      * @return the list of entities
      */
-    List<Vote> getAll();
+    List<Vote> getAll(Sort sort);
 
     /**
      * Get the "id" vote.

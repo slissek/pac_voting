@@ -1,5 +1,8 @@
 package com.prodyna.pac.voting.web.rest;
 
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
+
 import java.util.List;
 
 import javax.inject.Inject;
@@ -8,6 +11,7 @@ import javax.validation.Valid;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.hateoas.Link;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -70,7 +74,9 @@ public class AccountResource
         final User user = this.userService.getUserWithAuthorities();
         if (user != null)
         {
-            return new ResponseEntity<ManagedUserDTO>(UserConverter.toDto(user), HttpStatus.OK);
+            final ManagedUserDTO managedUserDTO = UserConverter.toDto(user);
+            this.hateoasLinkBuilder(managedUserDTO);
+            return new ResponseEntity<>(managedUserDTO, HttpStatus.OK);
         }
         else
         {
@@ -94,7 +100,7 @@ public class AccountResource
         if (existingUser != null)
         {
             this.userService.updateUserInformation(userDTO.getFirstName(), userDTO.getLastName());
-            return new ResponseEntity<String>(HttpStatus.OK);
+            return new ResponseEntity<>(HttpStatus.OK);
         }
         else
         {
@@ -122,5 +128,35 @@ public class AccountResource
         {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    /**
+     * Create link to self
+     *
+     * @param id
+     *            the id of the user
+     * @return the link to the method
+     */
+    public static Link createLinkToSelf()
+    {
+        return linkTo(methodOn(AccountResource.class).getAccount()).withSelfRel();
+    }
+
+    /**
+     * Create link to user sessions
+     *
+     * @param id
+     *            the id of the user
+     * @return the link to the method
+     */
+    public static Link createLinkToCurrentSessions()
+    {
+        return linkTo(methodOn(AccountResource.class).getCurrentSessions()).withSelfRel();
+    }
+
+    private void hateoasLinkBuilder(final ManagedUserDTO userDTO)
+    {
+        userDTO.add(AccountResource.createLinkToSelf());
+        userDTO.add(AccountResource.createLinkToCurrentSessions());
     }
 }

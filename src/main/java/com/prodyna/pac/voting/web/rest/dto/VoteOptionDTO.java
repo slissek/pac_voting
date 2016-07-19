@@ -3,9 +3,11 @@ package com.prodyna.pac.voting.web.rest.dto;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-public class VoteOptionDTO
+import org.springframework.hateoas.ResourceSupport;
+
+public class VoteOptionDTO extends ResourceSupport
 {
-    private Long id;
+    private Long identifier;
 
     private Long voteId;
 
@@ -22,20 +24,20 @@ public class VoteOptionDTO
     }
 
     /**
-     * @return the id
+     * @return the identifier
      */
-    public Long getId()
+    public Long getIdentifier()
     {
-        return this.id;
+        return this.identifier;
     }
 
     /**
-     * @param id
+     * @param identifier
      *            the id to set
      */
-    public void setId(final Long id)
+    public void setIdentifier(final Long identifier)
     {
-        this.id = id;
+        this.identifier = identifier;
     }
 
     /**

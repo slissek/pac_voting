@@ -2,6 +2,8 @@ package com.prodyna.pac.voting.service;
 
 import java.util.List;
 
+import org.springframework.data.domain.Sort;
+
 import com.prodyna.pac.voting.domain.UserVotings;
 
 /**
@@ -24,7 +26,7 @@ public interface UserVotingsService
      *
      * @return the list of entities
      */
-    List<UserVotings> findAll();
+    List<UserVotings> findAll(Sort sort);
 
     /**
      * Get the "id" userVotings.

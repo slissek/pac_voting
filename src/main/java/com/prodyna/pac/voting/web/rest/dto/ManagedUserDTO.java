@@ -5,15 +5,17 @@ import java.util.Set;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import org.springframework.hateoas.ResourceSupport;
+
 /**
  * A DTO extending the UserDTO, which is meant to be used in the user management UI.
  */
-public class ManagedUserDTO
+public class ManagedUserDTO extends ResourceSupport
 {
     public static final int PASSWORD_MIN_LENGTH = 4;
     public static final int PASSWORD_MAX_LENGTH = 100;
 
-    private Long id;
+    private Long identifier;
 
     @NotNull
     @Size(min = 1, max = 50)
@@ -36,20 +38,20 @@ public class ManagedUserDTO
     }
 
     /**
-     * @return the id
+     * @return the identifier
      */
-    public Long getId()
+    public Long getIdentifier()
     {
-        return this.id;
+        return this.identifier;
     }
 
     /**
-     * @param id
+     * @param identifier
      *            the id to set
      */
-    public void setId(final Long id)
+    public void setIdentifier(final Long identifier)
     {
-        this.id = id;
+        this.identifier = identifier;
     }
 
     /**

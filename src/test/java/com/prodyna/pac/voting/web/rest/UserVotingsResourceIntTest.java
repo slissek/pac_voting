@@ -21,9 +21,8 @@ import org.junit.runner.RunWith;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.IntegrationTest;
 import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -33,9 +32,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.prodyna.pac.voting.VotingApplication;
 import com.prodyna.pac.voting.domain.UserVotings;
-import com.prodyna.pac.voting.repository.UserVotingsRepository;
 import com.prodyna.pac.voting.service.UserVotingsService;
-
+import com.prodyna.pac.voting.web.rest.converter.UserVotingsConverter;
+import com.prodyna.pac.voting.web.rest.dto.UserVotingsDTO;
 
 /**
  * Test class for the UserVotingsResource REST controller.
@@ -46,8 +45,8 @@ import com.prodyna.pac.voting.service.UserVotingsService;
 @SpringApplicationConfiguration(classes = VotingApplication.class)
 @WebAppConfiguration
 @IntegrationTest
-public class UserVotingsResourceIntTest {
-
+public class UserVotingsResourceIntTest
+{
 
     private static final Long DEFAULT_USER_ID = 1L;
     private static final Long UPDATED_USER_ID = 2L;
@@ -59,50 +58,52 @@ public class UserVotingsResourceIntTest {
     private static final Long UPDATED_VOTE_OPTIONS_ID = 2L;
 
     @Inject
-    private UserVotingsRepository userVotingsRepository;
-
-    @Inject
     private UserVotingsService userVotingsService;
-
-    @Inject
-    private MappingJackson2HttpMessageConverter jacksonMessageConverter;
-
-    @Inject
-    private PageableHandlerMethodArgumentResolver pageableArgumentResolver;
 
     private MockMvc restUserVotingsMockMvc;
 
+    private UserVotingsDTO userVotingsDTO;
     private UserVotings userVotings;
+    private Sort sorting;
 
     @PostConstruct
-    public void setup() {
+    public void setup()
+    {
         MockitoAnnotations.initMocks(this);
         final UserVotingsResource userVotingsResource = new UserVotingsResource();
+
         ReflectionTestUtils.setField(userVotingsResource, "userVotingsService", this.userVotingsService);
-        this.restUserVotingsMockMvc = MockMvcBuilders.standaloneSetup(userVotingsResource)
-                .setCustomArgumentResolvers(this.pageableArgumentResolver)
-                .setMessageConverters(this.jacksonMessageConverter).build();
+
+        this.restUserVotingsMockMvc = MockMvcBuilders.standaloneSetup(userVotingsResource).build();
+        this.sorting = new Sort(Sort.Direction.ASC, "id");
     }
 
     @Before
-    public void initTest() {
-        this.userVotings = new UserVotings(DEFAULT_USER_ID, DEFAULT_VOTE_ID, DEFAULT_VOTE_OPTIONS_ID);
+    public void initTest()
+    {
+        this.userVotingsDTO = new UserVotingsDTO();
+        this.userVotingsDTO.setUserId(DEFAULT_USER_ID);
+        this.userVotingsDTO.setVoteId(DEFAULT_VOTE_ID);
+        this.userVotingsDTO.setVoteOptionsId(DEFAULT_VOTE_OPTIONS_ID);
+
+        this.userVotings = UserVotingsConverter.toEntity(this.userVotingsDTO);
     }
 
     @Test
     @Transactional
-    public void createUserVotings() throws Exception {
-        final int databaseSizeBeforeCreate = this.userVotingsRepository.findAll().size();
+    public void createUserVotings() throws Exception
+    {
+        final int databaseSizeBeforeCreate = this.userVotingsService.findAll(this.sorting).size();
 
         // Create the UserVotings
 
         this.restUserVotingsMockMvc.perform(post("/api/user-votings")
                 .contentType(TestUtil.APPLICATION_JSON_UTF8)
-                .content(TestUtil.convertObjectToJsonBytes(this.userVotings)))
+                .content(TestUtil.convertObjectToJsonBytes(this.userVotingsDTO)))
         .andExpect(status().isCreated());
 
         // Validate the UserVotings in the database
-        final List<UserVotings> userVotings = this.userVotingsRepository.findAll();
+        final List<UserVotings> userVotings = this.userVotingsService.findAll(this.sorting);
         assertThat(userVotings).hasSize(databaseSizeBeforeCreate + 1);
         final UserVotings testUserVotings = userVotings.get(userVotings.size() - 1);
         assertThat(testUserVotings.getUserId()).isEqualTo(DEFAULT_USER_ID);
@@ -113,69 +114,73 @@ public class UserVotingsResourceIntTest {
 
     @Test
     @Transactional
-    public void checkUserIdIsRequired() throws Exception {
-        final int databaseSizeBeforeTest = this.userVotingsRepository.findAll().size();
+    public void checkUserIdIsRequired() throws Exception
+    {
+        final int databaseSizeBeforeTest = this.userVotingsService.findAll(this.sorting).size();
         // set the field null
-        this.userVotings.setUserId(null);
+        this.userVotingsDTO.setUserId(null);
 
         // Create the UserVotings, which fails.
 
         this.restUserVotingsMockMvc.perform(post("/api/user-votings")
                 .contentType(TestUtil.APPLICATION_JSON_UTF8)
-                .content(TestUtil.convertObjectToJsonBytes(this.userVotings)))
+                .content(TestUtil.convertObjectToJsonBytes(this.userVotingsDTO)))
         .andExpect(status().isBadRequest());
 
-        final List<UserVotings> userVotings = this.userVotingsRepository.findAll();
+        final List<UserVotings> userVotings = this.userVotingsService.findAll(this.sorting);
         assertThat(userVotings).hasSize(databaseSizeBeforeTest);
     }
 
     @Test
     @Transactional
-    public void checkVoteIdIsRequired() throws Exception {
-        final int databaseSizeBeforeTest = this.userVotingsRepository.findAll().size();
+    public void checkVoteIdIsRequired() throws Exception
+    {
+        final int databaseSizeBeforeTest = this.userVotingsService.findAll(this.sorting).size();
         // set the field null
-        this.userVotings.setVoteId(null);
+        this.userVotingsDTO.setVoteId(null);
 
         // Create the UserVotings, which fails.
 
         this.restUserVotingsMockMvc.perform(post("/api/user-votings")
                 .contentType(TestUtil.APPLICATION_JSON_UTF8)
-                .content(TestUtil.convertObjectToJsonBytes(this.userVotings)))
+                .content(TestUtil.convertObjectToJsonBytes(this.userVotingsDTO)))
         .andExpect(status().isBadRequest());
 
-        final List<UserVotings> userVotings = this.userVotingsRepository.findAll();
+        final List<UserVotings> userVotings = this.userVotingsService.findAll(this.sorting);
         assertThat(userVotings).hasSize(databaseSizeBeforeTest);
     }
 
     @Test
     @Transactional
-    public void checkVoteOptionsIdIsRequired() throws Exception {
-        final int databaseSizeBeforeTest = this.userVotingsRepository.findAll().size();
+    public void checkVoteOptionsIdIsRequired() throws Exception
+    {
+        final int databaseSizeBeforeTest = this.userVotingsService.findAll(this.sorting).size();
         // set the field null
-        this.userVotings.setVoteOptionsId(null);
+        this.userVotingsDTO.setVoteOptionsId(null);
 
         // Create the UserVotings, which fails.
 
         this.restUserVotingsMockMvc.perform(post("/api/user-votings")
                 .contentType(TestUtil.APPLICATION_JSON_UTF8)
-                .content(TestUtil.convertObjectToJsonBytes(this.userVotings)))
+                .content(TestUtil.convertObjectToJsonBytes(this.userVotingsDTO)))
         .andExpect(status().isBadRequest());
 
-        final List<UserVotings> userVotings = this.userVotingsRepository.findAll();
+        final List<UserVotings> userVotings = this.userVotingsService.findAll(this.sorting);
         assertThat(userVotings).hasSize(databaseSizeBeforeTest);
     }
 
     @Test
     @Transactional
-    public void getAllUserVotings() throws Exception {
+    public void getAllUserVotings() throws Exception
+    {
         // Initialize the database
-        this.userVotingsRepository.saveAndFlush(this.userVotings);
+        this.userVotingsService.save(this.userVotings);
 
         // Get all the userVotings
-        this.restUserVotingsMockMvc.perform(get("/api/user-votings?sort=id,desc"))
+        this.restUserVotingsMockMvc.perform(get("/api/user-votings"))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(jsonPath("$.[*].id").value(hasItem(this.userVotings.getId().intValue())))
+        .andExpect(jsonPath("$.[*].identifier").value(hasItem(this.userVotings.getId().intValue())))
         .andExpect(jsonPath("$.[*].userId").value(hasItem(DEFAULT_USER_ID.intValue())))
         .andExpect(jsonPath("$.[*].voteId").value(hasItem(DEFAULT_VOTE_ID.intValue())))
         .andExpect(jsonPath("$.[*].voteOptionsId").value(hasItem(DEFAULT_VOTE_OPTIONS_ID.intValue())));
@@ -183,15 +188,16 @@ public class UserVotingsResourceIntTest {
 
     @Test
     @Transactional
-    public void getUserVotings() throws Exception {
+    public void getUserVotings() throws Exception
+    {
         // Initialize the database
-        this.userVotingsRepository.saveAndFlush(this.userVotings);
+        this.userVotingsService.save(this.userVotings);
 
         // Get the userVotings
         this.restUserVotingsMockMvc.perform(get("/api/user-votings/{id}", this.userVotings.getId()))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(jsonPath("$.id").value(this.userVotings.getId().intValue()))
+        .andExpect(jsonPath("$.identifier").value(this.userVotings.getId().intValue()))
         .andExpect(jsonPath("$.userId").value(DEFAULT_USER_ID.intValue()))
         .andExpect(jsonPath("$.voteId").value(DEFAULT_VOTE_ID.intValue()))
         .andExpect(jsonPath("$.voteOptionsId").value(DEFAULT_VOTE_OPTIONS_ID.intValue()));
@@ -199,7 +205,8 @@ public class UserVotingsResourceIntTest {
 
     @Test
     @Transactional
-    public void getNonExistingUserVotings() throws Exception {
+    public void getNonExistingUserVotings() throws Exception
+    {
         // Get the userVotings
         this.restUserVotingsMockMvc.perform(get("/api/user-votings/{id}", Long.MAX_VALUE))
         .andExpect(status().isNotFound());
@@ -207,15 +214,19 @@ public class UserVotingsResourceIntTest {
 
     @Test
     @Transactional
-    public void updateUserVotings() throws Exception {
+    public void updateUserVotings() throws Exception
+    {
         // Initialize the database
         this.userVotingsService.save(this.userVotings);
 
-        final int databaseSizeBeforeUpdate = this.userVotingsRepository.findAll().size();
+        final int databaseSizeBeforeUpdate = this.userVotingsService.findAll(this.sorting).size();
 
         // Update the userVotings
-        final UserVotings updatedUserVotings = new UserVotings(UPDATED_USER_ID, UPDATED_VOTE_ID, UPDATED_VOTE_OPTIONS_ID);
-        updatedUserVotings.setId(this.userVotings.getId());
+        final UserVotingsDTO updatedUserVotings = new UserVotingsDTO();
+        updatedUserVotings.setUserId(UPDATED_USER_ID);
+        updatedUserVotings.setVoteId(UPDATED_VOTE_ID);
+        updatedUserVotings.setVoteOptionsId(UPDATED_VOTE_OPTIONS_ID);
+        updatedUserVotings.setIdentifier(this.userVotings.getId());
 
         this.restUserVotingsMockMvc.perform(put("/api/user-votings")
                 .contentType(TestUtil.APPLICATION_JSON_UTF8)
@@ -223,7 +234,7 @@ public class UserVotingsResourceIntTest {
         .andExpect(status().isOk());
 
         // Validate the UserVotings in the database
-        final List<UserVotings> userVotings = this.userVotingsRepository.findAll();
+        final List<UserVotings> userVotings = this.userVotingsService.findAll(this.sorting);
         assertThat(userVotings).hasSize(databaseSizeBeforeUpdate);
         final UserVotings testUserVotings = userVotings.get(userVotings.size() - 1);
         assertThat(testUserVotings.getUserId()).isEqualTo(UPDATED_USER_ID);
@@ -234,11 +245,12 @@ public class UserVotingsResourceIntTest {
 
     @Test
     @Transactional
-    public void deleteUserVotings() throws Exception {
+    public void deleteUserVotings() throws Exception
+    {
         // Initialize the database
         this.userVotingsService.save(this.userVotings);
 
-        final int databaseSizeBeforeDelete = this.userVotingsRepository.findAll().size();
+        final int databaseSizeBeforeDelete = this.userVotingsService.findAll(this.sorting).size();
 
         // Get the userVotings
         this.restUserVotingsMockMvc.perform(delete("/api/user-votings/{id}", this.userVotings.getId())
@@ -246,7 +258,7 @@ public class UserVotingsResourceIntTest {
         .andExpect(status().isOk());
 
         // Validate the database is empty
-        final List<UserVotings> userVotings = this.userVotingsRepository.findAll();
+        final List<UserVotings> userVotings = this.userVotingsService.findAll(this.sorting);
         assertThat(userVotings).hasSize(databaseSizeBeforeDelete - 1);
     }
 }

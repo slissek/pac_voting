@@ -8,13 +8,19 @@ import javax.inject.Inject;
 
 import org.assertj.core.api.Assertions;
 import org.hamcrest.Matchers;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.IntegrationTest;
 import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -65,6 +71,7 @@ public class VoteResourceIntTest
 
     private VoteDTO voteDTO;
     private Vote vote;
+    private Sort sorting;
 
     @PostConstruct
     public void setup()
@@ -77,26 +84,40 @@ public class VoteResourceIntTest
         ReflectionTestUtils.setField(voteResource, "userVotingsService", this.userVotingsService);
 
         this.restVoteMockMvc = MockMvcBuilders.standaloneSetup(voteResource).build();
+        this.sorting = new Sort(Sort.Direction.ASC, "id");
+
+        final Authentication authentication = Mockito.mock(Authentication.class);
+        final UserDetails principal = Mockito.mock(UserDetails.class);
+
+        Mockito.when(principal.getAuthorities()).thenReturn(TestUtil.getAdminAuthorities());
+        Mockito.when(authentication.isAuthenticated()).thenReturn(true);
+        Mockito.when(authentication.getPrincipal()).thenReturn(principal);
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 
     @Before
     public void initTest()
     {
+        this.voteDTO = new VoteDTO();
+        this.voteDTO.setTopic(DEFAULT_TOPIC);
+        this.voteDTO.setUserId(DEFAULT_CREATOR_ID);
+        this.voteDTO.setUserVoted(DEFAULT_USER_VOTED);
 
-        final VoteDTO temp = new VoteDTO();
-        temp.setTopic(DEFAULT_TOPIC);
-        temp.setUserId(DEFAULT_CREATOR_ID);
-        temp.setUserVoted(DEFAULT_USER_VOTED);
-        this.voteDTO = temp;
+        this.vote = VoteConverter.toEntity(this.voteDTO, this.userService);
+    }
 
-        this.vote = VoteConverter.toEntity(temp, this.userService);
+    @After
+    public void tearDown()
+    {
+        SecurityContextHolder.clearContext();
     }
 
     @Test
     @Transactional
     public void createVote() throws Exception
     {
-        final int databaseSizeBeforeCreate = this.voteService.getAll().size();
+        final int databaseSizeBeforeCreate = this.voteService.getAll(this.sorting).size();
 
         // Create the Vote
 
@@ -106,7 +127,7 @@ public class VoteResourceIntTest
         .andExpect(MockMvcResultMatchers.status().isCreated());
 
         // Validate the Vote in the database
-        final List<Vote> votes = this.voteService.getAll();
+        final List<Vote> votes = this.voteService.getAll(this.sorting);
         Assertions.assertThat(votes).hasSize(databaseSizeBeforeCreate + 1);
         final Vote testVote = votes.get(votes.size() - 1);
         Assertions.assertThat(testVote.getCreated()).isEqualTo(VoteResourceIntTest.DEFAULT_CREATED);
@@ -118,7 +139,7 @@ public class VoteResourceIntTest
     @Transactional
     public void checkTopicIsRequired() throws Exception
     {
-        final int databaseSizeBeforeTest = this.voteService.getAll().size();
+        final int databaseSizeBeforeTest = this.voteService.getAll(this.sorting).size();
         // set the field null
         this.voteDTO.setTopic(null);
 
@@ -129,7 +150,7 @@ public class VoteResourceIntTest
                 .content(TestUtil.convertObjectToJsonBytes(this.voteDTO)))
         .andExpect(MockMvcResultMatchers.status().isBadRequest());
 
-        final List<Vote> votes = this.voteService.getAll();
+        final List<Vote> votes = this.voteService.getAll(this.sorting);
         Assertions.assertThat(votes).hasSize(databaseSizeBeforeTest);
     }
 
@@ -144,7 +165,7 @@ public class VoteResourceIntTest
         this.restVoteMockMvc.perform(MockMvcRequestBuilders.get("/api/votes"))
         .andExpect(MockMvcResultMatchers.status().isOk())
         .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(MockMvcResultMatchers.jsonPath("$.[*].id").value(Matchers.hasItem(this.vote.getId().intValue())))
+        .andExpect(MockMvcResultMatchers.jsonPath("$.[*].identifier").value(Matchers.hasItem(this.vote.getId().intValue())))
         .andExpect(MockMvcResultMatchers.jsonPath("$.[*].topic")
                 .value(Matchers.hasItem(VoteResourceIntTest.DEFAULT_TOPIC.toString())))
         .andExpect(MockMvcResultMatchers.jsonPath("$.[*].userVoted")
@@ -162,7 +183,7 @@ public class VoteResourceIntTest
         this.restVoteMockMvc.perform(MockMvcRequestBuilders.get("/api/votes/{id}", this.vote.getId()))
         .andExpect(MockMvcResultMatchers.status().isOk())
         .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(this.vote.getId().intValue()))
+        .andExpect(MockMvcResultMatchers.jsonPath("$.identifier").value(this.vote.getId().intValue()))
         .andExpect(MockMvcResultMatchers.jsonPath("$.topic").value(VoteResourceIntTest.DEFAULT_TOPIC.toString()))
         .andExpect(MockMvcResultMatchers.jsonPath("$.userVoted")
                 .value(VoteResourceIntTest.DEFAULT_USER_VOTED));
@@ -184,11 +205,11 @@ public class VoteResourceIntTest
         // Initialize the database
         this.voteService.save(this.vote);
 
-        final int databaseSizeBeforeUpdate = this.voteService.getAll().size();
+        final int databaseSizeBeforeUpdate = this.voteService.getAll(this.sorting).size();
 
         // Update the vote
         final VoteDTO updatedVote = new VoteDTO();
-        updatedVote.setId(this.vote.getId());
+        updatedVote.setIdentifier(this.vote.getId());
         updatedVote.setTopic(UPDATED_TOPIC);
         updatedVote.setUserId(UPDATED_CREATOR_ID);
         updatedVote.setUserVoted(UPDATED_USER_VOTED);
@@ -199,7 +220,7 @@ public class VoteResourceIntTest
         .andExpect(MockMvcResultMatchers.status().isOk());
 
         // Validate the Vote in the database
-        final List<Vote> votes = this.voteService.getAll();
+        final List<Vote> votes = this.voteService.getAll(this.sorting);
         Assertions.assertThat(votes).hasSize(databaseSizeBeforeUpdate);
         final Vote testVote = votes.get(votes.size() - 1);
         Assertions.assertThat(testVote.getCreated()).isEqualTo(VoteResourceIntTest.UPDATED_CREATED);
@@ -214,15 +235,15 @@ public class VoteResourceIntTest
         // Initialize the database
         this.voteService.save(this.vote);
 
-        final int databaseSizeBeforeDelete = this.voteService.getAll().size();
+        final int databaseSizeBeforeDelete = this.voteService.getAll(this.sorting).size();
 
         // Get the vote
-        this.restVoteMockMvc.perform(MockMvcRequestBuilders.delete("/api/votes/{id}", this.vote.getId())
+        this.restVoteMockMvc.perform(MockMvcRequestBuilders.delete("/api/votes/{id}", this.vote.getId().intValue())
                 .accept(TestUtil.APPLICATION_JSON_UTF8))
         .andExpect(MockMvcResultMatchers.status().isOk());
 
         // Validate the database is empty
-        final List<Vote> votes = this.voteService.getAll();
+        final List<Vote> votes = this.voteService.getAll(this.sorting);
         Assertions.assertThat(votes).hasSize(databaseSizeBeforeDelete - 1);
     }
 }

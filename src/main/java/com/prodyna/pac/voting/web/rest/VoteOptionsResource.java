@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.codahale.metrics.annotation.Timed;
 import com.prodyna.pac.voting.exceptions.PermissionsDeniedException;
+import com.prodyna.pac.voting.security.SecurityUtils;
 import com.prodyna.pac.voting.service.VoteOptionsService;
 import com.prodyna.pac.voting.web.rest.util.HeaderUtil;
 
@@ -49,6 +50,7 @@ public class VoteOptionsResource
         }
         catch (final PermissionsDeniedException ex)
         {
+            this.log.debug("User: " + SecurityUtils.getCurrentUserName() + " has no permissions to delete the voteOption");
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
     }

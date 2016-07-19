@@ -15,6 +15,7 @@ public class UserConverter
     public static User toEntity(final ManagedUserDTO userDTO, final AuthorityRepository authorityRepository)
     {
         final User user = new User();
+        user.setId(userDTO.getIdentifier());
         user.setFirstName(userDTO.getFirstName());
         user.setLastName(userDTO.getLastName());
         user.setPassword(userDTO.getPassword());
@@ -22,7 +23,7 @@ public class UserConverter
 
         if (userDTO.getAuthorities() != null)
         {
-            final Set<Authority> authorities = new HashSet<Authority>(userDTO.getAuthorities().size());
+            final Set<Authority> authorities = new HashSet<>(userDTO.getAuthorities().size());
             userDTO.getAuthorities().stream().forEach(authority -> authorities.add(authorityRepository.findOne(authority)));
             user.setAuthorities(authorities);
         }
@@ -32,13 +33,11 @@ public class UserConverter
 
     public static ManagedUserDTO toDto(final User user)
     {
-        final Set<String> authorities = new HashSet<String>(user.getAuthorities().size());
-        user.getAuthorities().stream().forEach(authority -> {
-            authorities.add(authority.getName());
-        });
+        final Set<String> authorities = new HashSet<>(user.getAuthorities().size());
+        user.getAuthorities().stream().forEach(authority -> authorities.add(authority.getName()));
 
         final ManagedUserDTO managedUserDTO = new ManagedUserDTO();
-        managedUserDTO.setId(user.getId());
+        managedUserDTO.setIdentifier(user.getId());
         managedUserDTO.setUserName(user.getUserName());
         managedUserDTO.setFirstName(user.getFirstName());
         managedUserDTO.setLastName(user.getLastName());
@@ -50,7 +49,7 @@ public class UserConverter
 
     public static List<ManagedUserDTO> toDtoList(final List<User> users)
     {
-        final List<ManagedUserDTO> result = new ArrayList<ManagedUserDTO>(users.size());
+        final List<ManagedUserDTO> result = new ArrayList<>(users.size());
         users.stream().forEach(user -> result.add(UserConverter.toDto(user)));
         return result;
     }

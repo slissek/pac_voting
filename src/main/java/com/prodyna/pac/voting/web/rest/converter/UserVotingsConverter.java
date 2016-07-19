@@ -11,7 +11,7 @@ public class UserVotingsConverter
     public static UserVotings toEntity(final UserVotingsDTO userVotingDTO)
     {
         final UserVotings userVotings = new UserVotings();
-        userVotings.setId(userVotingDTO.getId());
+        userVotings.setId(userVotingDTO.getIdentifier());
         userVotings.setUserId(userVotingDTO.getUserId());
         userVotings.setVoteId(userVotingDTO.getVoteId());
         userVotings.setVoteOptionsId(userVotingDTO.getVoteOptionsId());
@@ -21,7 +21,7 @@ public class UserVotingsConverter
     public static UserVotingsDTO toDto(final UserVotings userVoting)
     {
         final UserVotingsDTO userVotingsDTO = new UserVotingsDTO();
-        userVotingsDTO.setId(userVoting.getId());
+        userVotingsDTO.setIdentifier(userVoting.getId());
         userVotingsDTO.setUserId(userVoting.getUserId());
         userVotingsDTO.setVoteId(userVoting.getVoteId());
         userVotingsDTO.setVoteOptionsId(userVoting.getVoteOptionsId());
@@ -30,7 +30,7 @@ public class UserVotingsConverter
 
     public static List<UserVotingsDTO> toDtoList(final List<UserVotings> userVotings)
     {
-        final List<UserVotingsDTO> result = new ArrayList<UserVotingsDTO>(userVotings.size());
+        final List<UserVotingsDTO> result = new ArrayList<>(userVotings.size());
         userVotings.stream().forEach(userVoting -> result.add(UserVotingsConverter.toDto(userVoting)));
         return result;
     }

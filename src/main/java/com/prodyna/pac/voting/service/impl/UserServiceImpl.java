@@ -6,6 +6,7 @@ import javax.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.prodyna.pac.voting.domain.User;
 import com.prodyna.pac.voting.exceptions.PermissionsDeniedException;
 import com.prodyna.pac.voting.repository.UserRepository;
+import com.prodyna.pac.voting.security.AuthoritiesConstants;
 import com.prodyna.pac.voting.security.SecurityUtils;
 import com.prodyna.pac.voting.service.UserService;
 
@@ -31,32 +33,29 @@ public class UserServiceImpl implements UserService
     @Override
     public User save(final User user) throws PermissionsDeniedException
     {
-        // temporary disabled due to test issues
-        //        if (SecurityUtils.isCurrentUserInRole(AuthoritiesConstants.ADMIN))
-        //        {
-        final String encryptedPassword = new BCryptPasswordEncoder().encode(user.getPassword());
-        user.setPassword(encryptedPassword);
+        if (SecurityUtils.isCurrentUserInRole(AuthoritiesConstants.ADMIN))
+        {
+            final String encryptedPassword = new BCryptPasswordEncoder().encode(user.getPassword());
+            user.setPassword(encryptedPassword);
 
-        final User result = this.userRepository.save(user);
+            final User result = this.userRepository.save(user);
 
-        this.log.debug("Saved User: {}", result);
+            this.log.debug("Saved User: {}", result);
 
-        return result;
-        //        }
-        //        else
-        //        {
-        //            throw new PermissionsDeniedException();
-        //        }
+            return result;
+        }
+        else
+        {
+            throw new PermissionsDeniedException();
+        }
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<User> getAll()
+    public List<User> getAll(final Sort sort)
     {
         this.log.debug("Request to get all User");
-
-        final List<User> result = this.userRepository.findAll();
-        return result;
+        return this.userRepository.findAll(sort);
     }
 
     @Override
@@ -79,20 +78,19 @@ public class UserServiceImpl implements UserService
     public void delete(final Long id) throws PermissionsDeniedException
     {
         this.log.debug("Request to delete User : {}", id);
-        // temporary disabled due to test issues
-        //        if (SecurityUtils.isCurrentUserInRole(AuthoritiesConstants.ADMIN))
-        //        {
-        final User user = this.userRepository.findOne(id);
-        if (user != null)
+        if (SecurityUtils.isCurrentUserInRole(AuthoritiesConstants.ADMIN))
         {
-            this.userRepository.delete(id);
-            this.log.debug("User deleted: {}", user);
+            final User user = this.userRepository.findOne(id);
+            if (user != null)
+            {
+                this.userRepository.delete(id);
+                this.log.debug("User deleted: {}", user);
+            }
         }
-        // }
-        // else
-        // {
-        // throw new PermissionsDeniedException();
-        // }
+        else
+        {
+            throw new PermissionsDeniedException();
+        }
     }
 
     @Override

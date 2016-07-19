@@ -6,6 +6,7 @@ import javax.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,6 +14,8 @@ import com.prodyna.pac.voting.domain.UserVotings;
 import com.prodyna.pac.voting.domain.Vote;
 import com.prodyna.pac.voting.exceptions.PermissionsDeniedException;
 import com.prodyna.pac.voting.repository.VoteRepository;
+import com.prodyna.pac.voting.security.AuthoritiesConstants;
+import com.prodyna.pac.voting.security.SecurityUtils;
 import com.prodyna.pac.voting.service.UserVotingsService;
 import com.prodyna.pac.voting.service.VoteService;
 
@@ -35,12 +38,9 @@ public class VoteServiceImpl implements VoteService
     @Override
     public Vote save(final Vote vote) throws PermissionsDeniedException
     {
-        // temporary disabled due to test issues
-        // final boolean hasPermission = (vote.getId() == null)
-        // || (vote.getCreator().getUserName().equalsIgnoreCase(SecurityUtils.getCurrentUserName())
-        // || SecurityUtils.isCurrentUserInRole(AuthoritiesConstants.ADMIN));
-        final boolean hasPermission = true;
-
+        final boolean hasPermission = (vote.getId() == null)
+                || (vote.getCreator().getUserName().equalsIgnoreCase(SecurityUtils.getCurrentUserName())
+                        || SecurityUtils.isCurrentUserInRole(AuthoritiesConstants.ADMIN));
         if (hasPermission)
         {
             final Vote result = this.voteRepository.save(vote);
@@ -56,12 +56,10 @@ public class VoteServiceImpl implements VoteService
 
     @Override
     @Transactional(readOnly = true)
-    public List<Vote> getAll()
+    public List<Vote> getAll(final Sort sort)
     {
         this.log.debug("Request to get all Votes");
-
-        final List<Vote> result = this.voteRepository.findAll();
-        return result;
+        return this.voteRepository.findAll(sort);
     }
 
     @Override
@@ -69,8 +67,7 @@ public class VoteServiceImpl implements VoteService
     public Vote findOne(final Long id)
     {
         this.log.debug("Request to get Vote : {}", id);
-        final Vote vote = this.voteRepository.findOne(id);
-        return vote;
+        return this.voteRepository.findOne(id);
     }
 
     @Override
@@ -80,10 +77,8 @@ public class VoteServiceImpl implements VoteService
         final Vote vote = this.voteRepository.findOne(id);
         if (vote != null)
         {
-            // temporary disabled due to test issues
-            // boolean hasPermission = vote.getCreator().getUserName().equalsIgnoreCase(SecurityUtils.getCurrentUserName())
-            // || SecurityUtils.isCurrentUserInRole(AuthoritiesConstants.ADMIN);
-            final boolean hasPermission = true;
+            final boolean hasPermission = vote.getCreator().getUserName().equalsIgnoreCase(SecurityUtils.getCurrentUserName())
+                    || SecurityUtils.isCurrentUserInRole(AuthoritiesConstants.ADMIN);
             if (hasPermission)
             {
                 this.voteRepository.delete(id);

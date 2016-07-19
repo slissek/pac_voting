@@ -27,6 +27,8 @@ import com.hazelcast.instance.HazelcastInstanceFactory;
 @AutoConfigureAfter(value = { MetricsConfiguration.class })
 public class CacheConfiguration
 {
+    private static final String LOCALHOST = "127.0.0.1";
+
     private final Logger log = LoggerFactory.getLogger(CacheConfiguration.class);
 
     private static HazelcastInstance hazelcastInstance;
@@ -52,7 +54,7 @@ public class CacheConfiguration
     }
 
     @Bean
-    public HazelcastInstance hazelcastInstance(final ApplicationProperties applicationProperties)
+    public synchronized HazelcastInstance hazelcastInstance(final ApplicationProperties applicationProperties)
     {
         this.log.debug("Configuring Hazelcast");
 
@@ -65,7 +67,7 @@ public class CacheConfiguration
         // In development, remove multicast auto-configuration
         if (this.env.acceptsProfiles(Constants.SPRING_PROFILE_DEVELOPMENT))
         {
-            System.setProperty("hazelcast.local.localAddress", "127.0.0.1");
+            System.setProperty("hazelcast.local.localAddress", LOCALHOST);
 
             config.getNetworkConfig().getJoin().getAwsConfig().setEnabled(false);
             config.getNetworkConfig().getJoin().getMulticastConfig().setEnabled(false);

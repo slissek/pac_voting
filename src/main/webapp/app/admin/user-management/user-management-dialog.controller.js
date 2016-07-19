@@ -28,7 +28,7 @@
         }
 
         function save() {
-            if(vm.user.id !== null) {
+            if(vm.user.identifier !== null) {
                 User.update(vm.user, onSaveSuccess, onSaveError);
             } else {
                 User.save(vm.user, onSaveSuccess, onSaveError);

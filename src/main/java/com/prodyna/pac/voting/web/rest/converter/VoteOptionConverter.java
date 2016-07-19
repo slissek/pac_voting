@@ -17,7 +17,7 @@ public class VoteOptionConverter
     public static VoteOption toEntity(final VoteOptionDTO voteOptionDTO, final Vote vote)
     {
         final VoteOption voteOption = new VoteOption();
-        voteOption.setId(voteOptionDTO.getId());
+        voteOption.setId(voteOptionDTO.getIdentifier());
         voteOption.setText(voteOptionDTO.getText());
         voteOption.setVote(vote);
 
@@ -26,7 +26,7 @@ public class VoteOptionConverter
 
     public static Set<VoteOption> toEntitySet(final List<VoteOptionDTO> voteOptionDTOs, final Vote vote)
     {
-        final Set<VoteOption> voteOptions = new HashSet<VoteOption>();
+        final Set<VoteOption> voteOptions = new HashSet<>();
         if (voteOptionDTOs != null)
         {
             voteOptionDTOs.stream().forEach(voteOptionDTO -> voteOptions.add(VoteOptionConverter.toEntity(voteOptionDTO, vote)));
@@ -48,16 +48,13 @@ public class VoteOptionConverter
         final Long countForVoteIdAndOption = userVotingsService.getCountForVoteIdAndOption(vote.getId(), voteOption.getId());
         int percent = 0;
 
-        if ((countForVoteId != null) && (countForVoteIdAndOption != null))
+        if ((countForVoteId != null) && (countForVoteIdAndOption != null) && (countForVoteId != 0))
         {
-            if (countForVoteId != 0)
-            {
-                percent = (int) (((double) countForVoteIdAndOption / (double) countForVoteId) * 100);
-            }
+            percent = (int) (((double) countForVoteIdAndOption / (double) countForVoteId) * 100);
         }
 
         final VoteOptionDTO voteOptionDTO = new VoteOptionDTO();
-        voteOptionDTO.setId(voteOption.getId());
+        voteOptionDTO.setIdentifier(voteOption.getId());
         voteOptionDTO.setText(voteOption.getText());
         voteOptionDTO.setVoteId(vote.getId());
         voteOptionDTO.setPercent(percent);
@@ -69,7 +66,7 @@ public class VoteOptionConverter
     public static List<VoteOptionDTO> toDtoList(final Vote vote, final Collection<VoteOption> voteOptions,
             final UserVotingsService userVotingsService, final List<UserVotings> userVotings)
     {
-        final List<VoteOptionDTO> voteOptionDTOs = new ArrayList<VoteOptionDTO>();
+        final List<VoteOptionDTO> voteOptionDTOs = new ArrayList<>();
         if (voteOptions != null)
         {
             voteOptions.stream()

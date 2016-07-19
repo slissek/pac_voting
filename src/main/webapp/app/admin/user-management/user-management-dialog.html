@@ -7,7 +7,7 @@
         <alert-error></alert-error>
         <div class="form-group">
             <label>ID</label>
-            <input type="text" class="form-control" name="id" ng-model="vm.user.id" readonly>
+            <input type="text" class="form-control" name="id" ng-model="vm.user.identifier" readonly>
         </div>
 
         <div class="form-group">
@@ -47,7 +47,7 @@
             </div>
         </div>
 
-        <div ng-if="vm.user.id==undefined">
+        <div ng-if="vm.user.identifier==undefined">
             <label class="control-label">Password</label>
             <input type="password" class="form-control" id="password" name="password" ng-model="vm.user.password" 
                 ng-model-options="{allowInvalid: true}" ng-pattern="/^(?=.*[A-Za-z])(?=.*\d)(?=.*[$@$!%*#?&])[A-Za-z\d$@$!%*#?&]{4,50}$/" required>

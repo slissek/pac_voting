@@ -5,7 +5,7 @@
     </div>
     <div class="modal-body">
         <div class="form-group">
-            <input type="text" class="form-control hidden" name="id" ng-model="vm.vote.id" readonly>
+            <input type="text" class="form-control hidden" name="id" ng-model="vm.vote.identifier" readonly>
         </div>
 
         <div class="form-group">
@@ -33,7 +33,7 @@
             <div id="options" ng-repeat="option in vm.vote.voteOptions" ng-class="{ 'has-error' : voteOptionForm.voteOption.$invalid }">
                 <ng-form name="voteOptionForm">
                     <div class="form-group">
-                        <input type="text" class="form-control hidden" name="id" ng-model="option.id" readonly>
+                        <input type="text" class="form-control hidden" name="id" ng-model="option.identifier" readonly>
                     </div>
                     <input type="text" class="form-control" name="voteOption" ng-model="option.text" ng-minlength=1 ng-maxlength=100 required />
                     <div ng-show="voteOptionForm.voteOption.$invalid">

@@ -68,7 +68,7 @@
                     resolve: {
                         entity: function () {
                             return {
-                                id: null, userId: null, topic: null, options: []
+                                identifier: null, userId: null, topic: null, options: []
                             };
                         }
                     }
@@ -164,7 +164,7 @@
                     resolve: {
                         entity: function () {
                             return {
-                                id: null, userName: null, firstName: null, lastName: null, authorities: null
+                                identifier: null, userName: null, firstName: null, lastName: null, authorities: null
                             };
                         }
                     }

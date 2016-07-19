@@ -12,6 +12,8 @@ public class HeaderUtil
 {
     private static final Logger log = LoggerFactory.getLogger(HeaderUtil.class);
 
+    private static final String VOTING_APP = "VotingApp.";
+
     public static HttpHeaders createAlert(final String message, final String param)
     {
         final HttpHeaders headers = new HttpHeaders();
@@ -22,17 +24,17 @@ public class HeaderUtil
 
     public static HttpHeaders createEntityCreationAlert(final String entityName, final String param)
     {
-        return createAlert("VotingApp." + entityName + ".created", param);
+        return createAlert(VOTING_APP + entityName + ".created", param);
     }
 
     public static HttpHeaders createEntityUpdateAlert(final String entityName, final String param)
     {
-        return createAlert("VotingApp." + entityName + ".updated", param);
+        return createAlert(VOTING_APP + entityName + ".updated", param);
     }
 
     public static HttpHeaders createEntityDeletionAlert(final String entityName, final String param)
     {
-        return createAlert("VotingApp." + entityName + ".deleted", param);
+        return createAlert(VOTING_APP + entityName + ".deleted", param);
     }
 
     public static HttpHeaders createFailureAlert(final String entityName, final String errorKey, final String defaultMessage)

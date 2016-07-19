@@ -50,7 +50,7 @@ public class Vote implements Serializable
     private String topic;
 
     @OneToMany(mappedBy = "vote", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    private Set<VoteOption> voteOptions = new HashSet<VoteOption>();
+    private Set<VoteOption> voteOptions = new HashSet<>();
 
     public Vote()
     {

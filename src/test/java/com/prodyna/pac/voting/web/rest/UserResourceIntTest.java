@@ -16,12 +16,18 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.springframework.boot.test.IntegrationTest;
 import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -30,11 +36,11 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.prodyna.pac.voting.VotingApplication;
-import com.prodyna.pac.voting.domain.Authority;
 import com.prodyna.pac.voting.domain.User;
 import com.prodyna.pac.voting.repository.AuthorityRepository;
 import com.prodyna.pac.voting.security.AuthoritiesConstants;
 import com.prodyna.pac.voting.service.UserService;
+import com.prodyna.pac.voting.web.rest.converter.UserConverter;
 import com.prodyna.pac.voting.web.rest.dto.ManagedUserDTO;
 
 /**
@@ -69,6 +75,8 @@ public class UserResourceIntTest
     private ManagedUserDTO userDTO;
     private User user;
 
+    private Sort sorting;
+
     @PostConstruct
     public void setup()
     {
@@ -77,39 +85,44 @@ public class UserResourceIntTest
         ReflectionTestUtils.setField(userResource, "authorityRepository", this.authorityRepository);
 
         this.restUserMockMvc = MockMvcBuilders.standaloneSetup(userResource).build();
+
+        this.sorting = new Sort(Sort.Direction.ASC, "id");
+
+        final Authentication authentication = Mockito.mock(Authentication.class);
+        final UserDetails principal = Mockito.mock(UserDetails.class);
+
+        Mockito.when(principal.getAuthorities()).thenReturn(TestUtil.getAdminAuthorities());
+        Mockito.when(authentication.isAuthenticated()).thenReturn(true);
+        Mockito.when(authentication.getPrincipal()).thenReturn(principal);
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 
     @Before
     public void initTest()
     {
-        final ManagedUserDTO managedUserDTO = new ManagedUserDTO();
-        managedUserDTO.setId(null);
-        managedUserDTO.setUserName(DEFAULT_USER_NAME);
-        managedUserDTO.setFirstName(DEFAULT_FIRST_NAME);
-        managedUserDTO.setLastName(DEFAULT_LAST_NAME);
-        managedUserDTO.setPassword(DEFAULT_PASSWORD);
-        managedUserDTO.setAuthorities(Collections.singleton(AuthoritiesConstants.USER));
-        this.userDTO = managedUserDTO;
+        this.userDTO = new ManagedUserDTO();
+        this.userDTO.setIdentifier(null);
+        this.userDTO.setUserName(DEFAULT_USER_NAME);
+        this.userDTO.setFirstName(DEFAULT_FIRST_NAME);
+        this.userDTO.setLastName(DEFAULT_LAST_NAME);
+        this.userDTO.setPassword(DEFAULT_PASSWORD);
+        this.userDTO.setAuthorities(Collections.singleton(AuthoritiesConstants.USER));
 
-        final User user = new User();
-        user.setId(null);
-        user.setUserName(DEFAULT_USER_NAME);
-        user.setFirstName(DEFAULT_FIRST_NAME);
-        user.setLastName(DEFAULT_LAST_NAME);
-        user.setPassword(DEFAULT_PASSWORD);
+        this.user = UserConverter.toEntity(this.userDTO, this.authorityRepository);
+    }
 
-        final Authority authority = new Authority();
-        authority.setName(AuthoritiesConstants.USER);
-
-        user.setAuthorities(Collections.singleton(authority));
-        this.user = user;
+    @After
+    public void tearDown()
+    {
+        SecurityContextHolder.clearContext();
     }
 
     @Test
     @Transactional
     public void createUser() throws Exception
     {
-        final int databaseSizeBeforeCreate = this.userService.getAll().size();
+        final int databaseSizeBeforeCreate = this.userService.getAll(this.sorting).size();
 
         // Create the User
         final byte[] jsonBytes = TestUtil.convertObjectToJsonBytes(this.userDTO);
@@ -117,7 +130,7 @@ public class UserResourceIntTest
         .andExpect(status().isCreated());
 
         // Validate the User in the database
-        final List<User> users = this.userService.getAll();
+        final List<User> users = this.userService.getAll(this.sorting);
         assertThat(users).hasSize(databaseSizeBeforeCreate + 1);
 
         final User testUser = users.get(users.size() - 1);
@@ -132,7 +145,7 @@ public class UserResourceIntTest
     @Transactional
     public void checkUserNameIsRequired() throws Exception
     {
-        final int databaseSizeBeforeTest = this.userService.getAll().size();
+        final int databaseSizeBeforeTest = this.userService.getAll(this.sorting).size();
         // set the field null
         this.userDTO.setUserName(null);
 
@@ -140,7 +153,7 @@ public class UserResourceIntTest
         this.restUserMockMvc.perform(post("/api/users").contentType(TestUtil.APPLICATION_JSON_UTF8)
                 .content(TestUtil.convertObjectToJsonBytes(this.userDTO))).andExpect(status().isBadRequest());
 
-        final List<User> users = this.userService.getAll();
+        final List<User> users = this.userService.getAll(this.sorting);
         assertThat(users).hasSize(databaseSizeBeforeTest);
     }
 
@@ -154,7 +167,7 @@ public class UserResourceIntTest
         // Get all the users
         this.restUserMockMvc.perform(get("/api/users")).andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(jsonPath("$.[*].id").value(hasItem(DEFAULT_USER_ID.intValue())))
+        .andExpect(jsonPath("$.[*].identifier").value(hasItem(DEFAULT_USER_ID.intValue())))
         .andExpect(jsonPath("$.[*].userName").value(hasItem(DEFAULT_USER_NAME.toString())))
         .andExpect(jsonPath("$.[*].firstName").value(hasItem(DEFAULT_FIRST_NAME.toString())))
         .andExpect(jsonPath("$.[*].lastName").value(hasItem(DEFAULT_LAST_NAME.toString())));
@@ -170,7 +183,7 @@ public class UserResourceIntTest
         // Get the users
         this.restUserMockMvc.perform(get("/api/users/{id}", this.user.getId())).andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(jsonPath("$.id").value(this.user.getId().intValue()))
+        .andExpect(jsonPath("$.identifier").value(this.user.getId().intValue()))
         .andExpect(jsonPath("$.userName").value(DEFAULT_USER_NAME.toString()))
         .andExpect(jsonPath("$.firstName").value(DEFAULT_FIRST_NAME.toString()))
         .andExpect(jsonPath("$.lastName").value(DEFAULT_LAST_NAME.toString()));
@@ -191,7 +204,7 @@ public class UserResourceIntTest
         // Initialize the database
         this.userService.save(this.user);
 
-        final int databaseSizeBeforeUpdate = this.userService.getAll().size();
+        final int databaseSizeBeforeUpdate = this.userService.getAll(this.sorting).size();
 
         // Update the users
         final ManagedUserDTO updatedUser = new ManagedUserDTO();
@@ -200,13 +213,13 @@ public class UserResourceIntTest
         updatedUser.setUserName(UPDATED_USER_NAME);
         updatedUser.setPassword(UPDATED_PASSWORD);
         updatedUser.setAuthorities(Collections.singleton(AuthoritiesConstants.USER));
-        updatedUser.setId(this.user.getId());
+        updatedUser.setIdentifier(this.user.getId());
 
         this.restUserMockMvc.perform(put("/api/users").contentType(TestUtil.APPLICATION_JSON_UTF8)
                 .content(TestUtil.convertObjectToJsonBytes(updatedUser))).andExpect(status().isOk());
 
         // Validate the User in the database
-        final List<User> users = this.userService.getAll();
+        final List<User> users = this.userService.getAll(this.sorting);
         assertThat(users).hasSize(databaseSizeBeforeUpdate);
 
         final User testUser = users.get(users.size() - 1);
@@ -224,7 +237,7 @@ public class UserResourceIntTest
         // Initialize the database
         this.userService.save(this.user);
 
-        final int databaseSizeBeforeDelete = this.userService.getAll().size();
+        final int databaseSizeBeforeDelete = this.userService.getAll(this.sorting).size();
 
         // Get the users
         this.restUserMockMvc
@@ -232,7 +245,7 @@ public class UserResourceIntTest
         .andExpect(status().isOk());
 
         // Validate the database is empty
-        final List<User> users = this.userService.getAll();
+        final List<User> users = this.userService.getAll(this.sorting);
         assertThat(users).hasSize(databaseSizeBeforeDelete - 1);
     }
 }

@@ -7,14 +7,19 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZonedDateTime;
+import java.util.Collections;
+import java.util.Set;
 
 import org.springframework.http.MediaType;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.google.common.collect.ImmutableSet;
 import com.prodyna.pac.voting.domain.util.JSR310DateTimeSerializer;
 import com.prodyna.pac.voting.domain.util.JSR310LocalDateDeserializer;
+import com.prodyna.pac.voting.security.AuthoritiesConstants;
 
 /**
  * Utility class for testing REST controllers.
@@ -66,5 +71,12 @@ public class TestUtil
             byteArray[i] = Byte.parseByte(data, 2);
         }
         return byteArray;
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T> ImmutableSet<T> getAdminAuthorities()
+    {
+        final Set<SimpleGrantedAuthority> set = Collections.singleton(new SimpleGrantedAuthority(AuthoritiesConstants.ADMIN));
+        return (ImmutableSet<T>) ImmutableSet.copyOf(set);
     }
 }

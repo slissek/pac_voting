@@ -17,7 +17,7 @@
         vm.save = save;
         vm.vote = entity;
         vm.voteOption = {
-                newOption : {id: null, text:''}
+                newOption : {identifier: null, text:''}
         };
 
         Principal.identity().then(function(account) {
@@ -29,7 +29,7 @@
                 vm.vote.voteOptions = [];
             }
             vm.vote.voteOptions.push(vm.voteOption.newOption);
-            vm.voteOption.newOption = {id: null, text:''}
+            vm.voteOption.newOption = {identifier: null, text:''}
         }
 
         function clear()
@@ -45,11 +45,11 @@
             if (vm.vote.voteOptions.length > 0) {
                 vm.vote.voteOptions.splice(vm.vote.voteOptions.indexOf(option), 1);
             }
-            vm.voteOption.newOption = {id: null, text:''}
+            vm.voteOption.newOption = {identifier: null, text:''}
 
-            if (option.id !== null) 
+            if (option.identifier !== null) 
             {
-                VoteOptions.delete({id: option.id});
+                VoteOptions.delete({id: option.identifier});
             }
         }
 
@@ -64,8 +64,8 @@
 
         function save()
         {
-            vm.vote.userId = vm.currentAccount.id;
-            if (vm.vote.id !== null) {
+            vm.vote.userId = vm.currentAccount.identifier;
+            if (vm.vote.identifier !== null) {
                 Votes.update(vm.vote, onSaveSuccess, onSaveError);
             } else {
                 Votes.save(vm.vote, onSaveSuccess, onSaveError);

@@ -204,3 +204,6 @@ Eclipse menu "Window" > "Preferences" search for "Save Actions" for Java > Edito
 Within the workspace, a folder configuration is provided which contains formatter files. Import them as follows:
 - Eclipse menu "Window" > "Preferences" > "Java" > "Code Style" > "Formatter"
 - Eclipse menu "Window" > "Preferences" > "JavaScript" > "Code Style" > "Formatter"
+
+**Find Bugs**
+TODO

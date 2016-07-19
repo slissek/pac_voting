@@ -6,9 +6,11 @@ import java.util.List;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-public class VoteDTO
+import org.springframework.hateoas.ResourceSupport;
+
+public class VoteDTO extends ResourceSupport
 {
-    private Long id;
+    private Long identifier;
 
     @NotNull
     private Long userId;
@@ -28,20 +30,20 @@ public class VoteDTO
     }
 
     /**
-     * @return the id
+     * @return the identifier
      */
-    public Long getId()
+    public Long getIdentifier()
     {
-        return this.id;
+        return this.identifier;
     }
 
     /**
-     * @param id
+     * @param identifier
      *            the id to set
      */
-    public void setId(final Long id)
+    public void setIdentifier(final Long identifier)
     {
-        this.id = id;
+        this.identifier = identifier;
     }
 
     /**

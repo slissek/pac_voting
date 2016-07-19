@@ -3,14 +3,9 @@ package com.prodyna.pac.voting.security;
 /**
  * Constants for Spring Security authorities.
  */
-public final class AuthoritiesConstants {
-
-    public static final String ADMIN = "ROLE_ADMIN";
-
-    public static final String USER = "ROLE_USER";
-
-    public static final String ANONYMOUS = "ROLE_ANONYMOUS";
-
-    private AuthoritiesConstants() {
-    }
+public interface AuthoritiesConstants
+{
+    String ADMIN = "ROLE_ADMIN";
+    String USER = "ROLE_USER";
+    String ANONYMOUS = "ROLE_ANONYMOUS";
 }

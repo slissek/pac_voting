@@ -17,6 +17,8 @@ management:
 spring:
     application:
         name: slissek-pac
+    profiles:
+        active: #spring.profies.active#
     datasource:
         platform: postgres
         url: jdbc:postgresql://localhost:5432/pac
@@ -43,7 +45,10 @@ server:
 security:
     basic:
         enabled: false
-    
+
+#===================================================================
+# VotingApp sepcific properties
+#===================================================================
 voting:
     cache: # Hibernate 2nd level cache, used by CacheConfiguration
         timeToLiveSeconds: 3600
@@ -69,4 +74,3 @@ voting:
         description: VotingApp API documentation
         version: 1.0.0
         enabled: true
-

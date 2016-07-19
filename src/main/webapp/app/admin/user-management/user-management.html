@@ -20,9 +20,9 @@
                 </tr>
             </thead>
             <tbody>
-                <tr ng-repeat="user in vm.users track by user.id">
+                <tr ng-repeat="user in vm.users track by user.identifier">
                     <td>
-                        <a ui-sref="user-management-detail({id:user.id})">{{user.id}}</a>
+                        <a ui-sref="user-management-detail({id:user.identifier})">{{user.identifier}}</a>
                     </td>
                     <td>{{user.userName}}</td>
                     <td>{{user.firstName}}</td>
@@ -34,15 +34,15 @@
                     </td>
                     <td class="text-right">
                         <div class="btn-group flex-btn-group-container">
-                            <button type="submit" ui-sref="user-management-detail({id:user.id})" class="btn btn-info btn-sm">
+                            <button type="submit" ui-sref="user-management-detail({id:user.identifier})" class="btn btn-info btn-sm">
                                 <span class="glyphicon glyphicon-eye-open"></span>
                                 <span class="hidden-xs hidden-sm"></span>
                             </button>
-                            <button type="submit" ui-sref="user-management.edit({id:user.id})" class="btn btn-primary btn-sm">
+                            <button type="submit" ui-sref="user-management.edit({id:user.identifier})" class="btn btn-primary btn-sm">
                                 <span class="glyphicon glyphicon-pencil"></span>
                                 <span class="hidden-xs hidden-sm"></span>
                             </button>
-                            <button type="submit" ui-sref="user-management.delete({id:user.id})" class="btn btn-danger btn-sm" ng-disabled="vm.currentAccount.id==user.id">
+                            <button type="submit" ui-sref="user-management.delete({id:user.identifier})" class="btn btn-danger btn-sm" ng-disabled="vm.currentAccount.id==user.id">
                                 <span class="glyphicon glyphicon-remove-circle"></span>
                                 <span class="hidden-xs hidden-sm"></span>
                             </button>

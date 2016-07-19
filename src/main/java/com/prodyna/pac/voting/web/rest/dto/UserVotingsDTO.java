@@ -2,9 +2,11 @@ package com.prodyna.pac.voting.web.rest.dto;
 
 import javax.validation.constraints.NotNull;
 
-public class UserVotingsDTO
+import org.springframework.hateoas.ResourceSupport;
+
+public class UserVotingsDTO extends ResourceSupport
 {
-    private Long id;
+    private Long identifier;
 
     @NotNull
     private Long userId;
@@ -20,20 +22,20 @@ public class UserVotingsDTO
     }
 
     /**
-     * @return the id
+     * @return the identifier
      */
-    public Long getId()
+    public Long getIdentifier()
     {
-        return this.id;
+        return this.identifier;
     }
 
     /**
-     * @param id
+     * @param identifier
      *            the id to set
      */
-    public void setId(final Long id)
+    public void setIdentifier(final Long identifier)
     {
-        this.id = id;
+        this.identifier = identifier;
     }
 
     /**

@@ -14,6 +14,8 @@ import com.prodyna.pac.voting.domain.Vote;
 import com.prodyna.pac.voting.domain.VoteOption;
 import com.prodyna.pac.voting.exceptions.PermissionsDeniedException;
 import com.prodyna.pac.voting.repository.VoteOptionsRepository;
+import com.prodyna.pac.voting.security.AuthoritiesConstants;
+import com.prodyna.pac.voting.security.SecurityUtils;
 import com.prodyna.pac.voting.service.UserVotingsService;
 import com.prodyna.pac.voting.service.VoteOptionsService;
 
@@ -43,8 +45,7 @@ public class VoteOptionsServiceImpl implements VoteOptionsService
     public VoteOption save(final VoteOption voteOption)
     {
         this.log.debug("Request to save VoteOptions : {}", voteOption);
-        final VoteOption result = this.voteOptionsRepository.save(voteOption);
-        return result;
+        return this.voteOptionsRepository.save(voteOption);
     }
 
     /**
@@ -57,8 +58,7 @@ public class VoteOptionsServiceImpl implements VoteOptionsService
     public List<VoteOption> findAll()
     {
         this.log.debug("Request to get all VoteOptions");
-        final List<VoteOption> result = this.voteOptionsRepository.findAll();
-        return result;
+        return this.voteOptionsRepository.findAll();
     }
 
     /**
@@ -73,8 +73,7 @@ public class VoteOptionsServiceImpl implements VoteOptionsService
     public VoteOption findOne(final Long id)
     {
         this.log.debug("Request to get VoteOptions : {}", id);
-        final VoteOption voteOptions = this.voteOptionsRepository.findOne(id);
-        return voteOptions;
+        return this.voteOptionsRepository.findOne(id);
     }
 
     /**
@@ -87,31 +86,34 @@ public class VoteOptionsServiceImpl implements VoteOptionsService
     public void delete(final Long id) throws PermissionsDeniedException
     {
         this.log.debug("Request to delete VoteOptions : {}", id);
-        // temporary disabled due to test issues
-        // boolean hasPermission = vote.getCreator().getUserName().equalsIgnoreCase(SecurityUtils.getCurrentUserName())
-        // || SecurityUtils.isCurrentUserInRole(AuthoritiesConstants.ADMIN);
-        final boolean hasPermission = true;
-        if (hasPermission)
+        final VoteOption voteOption = this.voteOptionsRepository.getOne(id);
+        if (voteOption != null)
         {
-            final VoteOption voteOptions = this.voteOptionsRepository.findOne(id);
-            if (voteOptions != null)
+            final boolean hasPermission = voteOption.getVote().getCreator().getUserName()
+                    .equalsIgnoreCase(SecurityUtils.getCurrentUserName())
+                    || SecurityUtils.isCurrentUserInRole(AuthoritiesConstants.ADMIN);
+            if (hasPermission)
             {
-                this.voteOptionsRepository.delete(id);
-                this.log.debug("VoteOption deleted: {}", voteOptions);
-
-                final List<UserVotings> userVotingsByOptionsId = this.userVotingService.findByVoteOptionsId(id);
-                for (final UserVotings userVotings : userVotingsByOptionsId)
+                final VoteOption voteOptions = this.voteOptionsRepository.findOne(id);
+                if (voteOptions != null)
                 {
-                    final Long userVotingId = userVotings.getId();
-                    this.log.debug("Request to delete UserVoting : {}", userVotingId);
-                    this.userVotingService.delete(userVotingId);
+                    this.voteOptionsRepository.delete(id);
+                    this.log.debug("VoteOption deleted: {}", voteOptions);
+
+                    final List<UserVotings> userVotingsByOptionsId = this.userVotingService.findByVoteOptionsId(id);
+                    for (final UserVotings userVotings : userVotingsByOptionsId)
+                    {
+                        final Long userVotingId = userVotings.getId();
+                        this.log.debug("Request to delete UserVoting : {}", userVotingId);
+                        this.userVotingService.delete(userVotingId);
+                    }
                 }
             }
-        }
-        else
-        {
-            this.log.debug("The current user has no priviliges to delete the voteOption with id: {}", id);
-            throw new PermissionsDeniedException();
+            else
+            {
+                this.log.debug("The current user has no priviliges to delete the voteOption with id: {}", id);
+                throw new PermissionsDeniedException();
+            }
         }
     }
 
@@ -127,7 +129,6 @@ public class VoteOptionsServiceImpl implements VoteOptionsService
     public List<VoteOption> findAllByVote(final Vote vote)
     {
         this.log.debug("Request to get all VoteOptions relates to vote: {}", vote);
-        final List<VoteOption> voteOptionsByVote = this.voteOptionsRepository.findAllByVote(vote);
-        return voteOptionsByVote;
+        return this.voteOptionsRepository.findAllByVote(vote);
     }
 }
