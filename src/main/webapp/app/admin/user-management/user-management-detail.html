@@ -1,8 +1,14 @@
 <div>
     <h3>
-        <span>User</span> "{{vm.user.identifier}}"
+        <span>User</span>
     </h3>
     <dl class="dl-horizontal">
+        <dt>
+            <span>Id</span>
+        </dt>
+        <dd>
+            <span>{{vm.user.identifier}}</span>
+        </dd>
         <dt>
             <span>Username</span>
         </dt>
@@ -12,20 +18,66 @@
         <dt>
             <span>First Name</span>
         </dt>
-        <dd>{{vm.user.firstName}}</dd>
+        <dd>
+            <span>{{vm.user.firstName}}</span>
+        </dd>
         <dt>
             <span>Last Name</span>
         </dt>
-        <dd>{{vm.user.lastName}}</dd>
+        <dd>
+            <span>{{vm.user.lastName}}</span>
+        </dd>
         <dt>
             <span>Profiles</span>
         </dt>
         <dd>
             <ul class="list-unstyled">
-                <li ng-repeat="authority in vm.user.authorities"><span>{{authority}}</span></li>
+                <li ng-repeat="authority in vm.user.authorities">
+                    <span>{{authority}}</span>
+                </li>
             </ul>
         </dd>
     </dl>
+
+    <h3>
+        <span>Votes created by user</span>
+    </h3>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Vote Id</th>
+                    <th>Vote Topic</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="vote in vm.votescreator">
+                    <td>{{vote.identifier}}</td>
+                    <td>{{vote.topic}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h3>
+        <span>Votings of user</span>
+    </h3>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Vote Id</th>
+                    <th>Vote Option Id</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="uservote in vm.uservotes">
+                    <td>{{uservote.voteId}}</td>
+                    <td>{{uservote.voteOptionsId}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
     <button type="submit" ui-sref="user-management" class="btn btn-info">
         <span class="glyphicon glyphicon-arrow-left"></span>&nbsp;
         <span>Back</span>

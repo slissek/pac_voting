@@ -99,4 +99,19 @@ public class VoteServiceImpl implements VoteService
             }
         }
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Vote> getVotesByCreator(final Long userId)
+    {
+        this.log.debug("Request to get all Votes created by user: " + userId);
+        return this.voteRepository.findByCreatorId(userId);
+    }
+
+    @Override
+    public Long getVoteCountByCreator(final Long userId)
+    {
+        this.log.debug("Request to get count of votes created by user: " + userId);
+        return this.voteRepository.countByCreatorId(userId);
+    }
 }

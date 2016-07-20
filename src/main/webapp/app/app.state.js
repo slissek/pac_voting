@@ -203,10 +203,10 @@
             }]
         })
 
-        .state('user-management-detail',
+        .state('user-management.detail',
         {
             parent : 'admin',
-            url : '/user-management-detail',
+            url : '/{id}/detail',
             data: {
                 authorities: ['ROLE_ADMIN']
             },

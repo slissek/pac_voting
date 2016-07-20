@@ -55,4 +55,21 @@ public interface VoteService
      */
     void delete(Long id) throws PermissionsDeniedException;
 
+    /**
+     * Get all votes created by given user
+     *
+     * @param userId
+     *            the id of the creator of the vote
+     * @return the list of entities
+     */
+    List<Vote> getVotesByCreator(Long userId);
+
+    /**
+     * Get the count of votes created by given user
+     *
+     * @param userId
+     *            the id of the creator of the vote
+     * @return the count of created votes
+     */
+    Long getVoteCountByCreator(Long userId);
 }

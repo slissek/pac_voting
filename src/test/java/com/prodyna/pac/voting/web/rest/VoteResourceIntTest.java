@@ -31,6 +31,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.prodyna.pac.voting.VotingApplication;
+import com.prodyna.pac.voting.domain.UserVotings;
 import com.prodyna.pac.voting.domain.Vote;
 import com.prodyna.pac.voting.service.UserService;
 import com.prodyna.pac.voting.service.UserVotingsService;
@@ -245,5 +246,41 @@ public class VoteResourceIntTest
         // Validate the database is empty
         final List<Vote> votes = this.voteService.getAll(this.sorting);
         Assertions.assertThat(votes).hasSize(databaseSizeBeforeDelete - 1);
+    }
+
+    @Test
+    @Transactional
+    public void getAllVotingsForVotes() throws Exception
+    {
+        // Initialize the database
+        this.voteService.save(this.vote);
+
+        final UserVotings userVotings = new UserVotings();
+        userVotings.setUserId(DEFAULT_CREATOR_ID);
+        userVotings.setVoteId(this.vote.getId());
+        userVotings.setVoteOptionsId(1L);
+        this.userVotingsService.save(userVotings);
+
+        final int voteIdIntValue = this.vote.getId().intValue();
+        this.restVoteMockMvc.perform(MockMvcRequestBuilders.get("/api/votes/{id}/votings", voteIdIntValue))
+        .andExpect(MockMvcResultMatchers.status().isOk())
+        .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+        .andExpect(MockMvcResultMatchers.jsonPath("$.[*].voteId").value(Matchers.hasItem(voteIdIntValue)));
+    }
+
+    @Test
+    @Transactional
+    public void getAllVotesForCreator() throws Exception
+    {
+        // Initialize the database
+        this.voteService.save(this.vote);
+
+        // Get the vote
+        final int creatorIdIntValue = this.vote.getCreator().getId().intValue();
+        this.restVoteMockMvc.perform(MockMvcRequestBuilders.get("/api/votes/users/{id}", creatorIdIntValue))
+        .andExpect(MockMvcResultMatchers.status().isOk())
+        .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+        .andExpect(MockMvcResultMatchers.jsonPath("$.[*].userId").value(Matchers.hasItem(creatorIdIntValue)));
+
     }
 }

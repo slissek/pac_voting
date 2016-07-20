@@ -233,6 +233,35 @@ public class VoteResource
         return new ResponseEntity<>(dtoList, HttpStatus.OK);
     }
 
+    /**
+     * GET /votes/users/{id} : get all the votes created by given user.
+     *
+     * @return the ResponseEntity with status 200 (OK) and the list of votes in body
+     */
+    @RequestMapping(value = "/votes/users/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    public ResponseEntity<List<VoteDTO>> getAllVotesForCreator(@PathVariable final Long id)
+    {
+        this.log.debug("REST request to get all Votes created by user: " + id);
+
+        if (id != null)
+        {
+            final List<VoteDTO> voteList = new ArrayList<>();
+            this.voteService.getVotesByCreator(id).stream()
+            .forEach(vote -> {
+                final VoteDTO voteDTO = VoteConverter.toDto(this.getCurrentUserId(), vote, this.userVotingsService);
+                voteDTO.add(VoteResource.createLinkToSelf(voteDTO.getIdentifier()));
+                voteList.add(voteDTO);
+            });
+            return new ResponseEntity<>(voteList, HttpStatus.OK);
+        }
+        else
+        {
+            this.log.debug("The user with id: " + id + " was not found.");
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
     public static Link createLinkToSelf(final Long id)
     {
         return linkTo(methodOn(VoteResource.class).getVote(id)).withSelfRel();
