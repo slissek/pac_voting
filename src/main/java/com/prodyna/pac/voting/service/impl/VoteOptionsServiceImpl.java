@@ -86,15 +86,14 @@ public class VoteOptionsServiceImpl implements VoteOptionsService
     public void delete(final Long id) throws PermissionsDeniedException
     {
         this.log.debug("Request to delete VoteOptions : {}", id);
-        final VoteOption voteOption = this.voteOptionsRepository.getOne(id);
-        if (voteOption != null)
+        final VoteOption voteOptions = this.voteOptionsRepository.findOne(id);
+        if (voteOptions != null)
         {
-            final boolean hasPermission = voteOption.getVote().getCreator().getUserName()
+            final boolean hasPermission = voteOptions.getVote().getCreator().getUserName()
                     .equalsIgnoreCase(SecurityUtils.getCurrentUserName())
                     || SecurityUtils.isCurrentUserInRole(AuthoritiesConstants.ADMIN);
             if (hasPermission)
             {
-                final VoteOption voteOptions = this.voteOptionsRepository.findOne(id);
                 if (voteOptions != null)
                 {
                     this.voteOptionsRepository.delete(id);

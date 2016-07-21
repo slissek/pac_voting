@@ -66,7 +66,7 @@ public class VoteOption implements Serializable
     @Override
     public String toString()
     {
-        return String.format("VoteOptions [id=%s, text=%s, vote=%s]", this.id, this.text, this.vote);
+        return String.format("VoteOptions [id=%s, text=%s]", this.id, this.text);
     }
 
     @Override
