@@ -138,7 +138,7 @@ users | 1;"";"admin" , "admin" 2;"test";"user", "test"
 
 ### Maven
 
-In your maven settings file, the maven central repository should be configured.
+If not available, please install maven as Java build tool. In your maven settings file, the maven central repository should be configured.
 
 ### GIT
 
@@ -146,6 +146,8 @@ Please install git and provide a name and your email address in the *git config*
 
     git config --global user.name "John Doe"
     git config --global user.email johndoe@example.com
+
+We would recommend you also use a tool like SourceTree if you are starting with Git.
 
 ### Eclipse
 
