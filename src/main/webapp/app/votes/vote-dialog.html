@@ -47,10 +47,12 @@
                             The vote option cannot be longer than 100 characters.
                         </p>
                     </div>
-<!--                     <button type="button" class="btn btn-danger text-right" ng-click="vm.deleteVoteOption(option)"> -->
-<!--                         <span class="glyphicon glyphicon-remove-circle"></span>&nbsp; -->
-<!--                         <span>Delete</span> -->
-<!--                     </button> -->
+                    <div ng-if="option.identifier === null">
+                        <button type="button" class="btn btn-danger text-right" ng-click="vm.deleteVoteOption(option)">
+                            <span class="glyphicon glyphicon-remove-circle"></span>&nbsp;
+                            <span>Delete</span>
+                        </button>
+                    </div>
                 </ng-form>
             </div>
             <div>
