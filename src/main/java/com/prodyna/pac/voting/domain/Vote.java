@@ -191,5 +191,12 @@ public class Vote implements Serializable
         this.voteOptions = voteOptions;
     }
 
-
+    /**
+     * @param voteOption the voteOption to remove
+     */
+    public void removeVoteOption(final VoteOption voteOption)
+    {
+        this.voteOptions.remove(voteOption);
+        voteOption.setVote(null);
+    }
 }

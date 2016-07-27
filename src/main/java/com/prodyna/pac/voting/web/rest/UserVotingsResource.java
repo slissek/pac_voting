@@ -103,6 +103,15 @@ public class UserVotingsResource
         {
             return this.createUserVotings(userVotingsDTO);
         }
+        // Check if user already voted
+        final List<UserVotings> findByUserIdAndVoteId = this.userVotingsService.findByUserIdAndVoteId(userVotingsDTO.getUserId(),
+                userVotingsDTO.getVoteId());
+        if ((findByUserIdAndVoteId != null) && (!findByUserIdAndVoteId.isEmpty()))
+        {
+            return ResponseEntity.badRequest()
+                    .headers(HeaderUtil.createFailureAlert("userVotings", "useralreadyvoted", "The user already voted this vote"))
+                    .body(null);
+        }
         final UserVotings userVotings = UserVotingsConverter.toEntity(userVotingsDTO);
         final UserVotingsDTO result = UserVotingsConverter.toDto(this.userVotingsService.save(userVotings));
         result.add(UserVotingsResource.createLinktToSelf(result.getIdentifier()));
@@ -121,7 +130,8 @@ public class UserVotingsResource
     public List<UserVotingsDTO> getAllUserVotings()
     {
         this.log.debug("REST request to get all UserVotings");
-        final List<UserVotingsDTO> userVotings = UserVotingsConverter.toDtoList(this.userVotingsService.findAll(new Sort(Sort.Direction.ASC, "id")));
+        final List<UserVotingsDTO> userVotings = UserVotingsConverter
+                .toDtoList(this.userVotingsService.findAll(new Sort(Sort.Direction.ASC, "id")));
         userVotings.stream().forEach(userVoting -> userVoting.add(UserVotingsResource.createLinktToSelf(userVoting.getIdentifier())));
         return userVotings;
     }

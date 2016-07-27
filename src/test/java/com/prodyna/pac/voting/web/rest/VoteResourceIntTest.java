@@ -10,6 +10,7 @@ import org.assertj.core.api.Assertions;
 import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
@@ -33,11 +34,16 @@ import org.springframework.transaction.annotation.Transactional;
 import com.prodyna.pac.voting.VotingApplication;
 import com.prodyna.pac.voting.domain.UserVotings;
 import com.prodyna.pac.voting.domain.Vote;
+import com.prodyna.pac.voting.domain.VoteOption;
 import com.prodyna.pac.voting.service.UserService;
 import com.prodyna.pac.voting.service.UserVotingsService;
+import com.prodyna.pac.voting.service.VoteOptionsService;
 import com.prodyna.pac.voting.service.VoteService;
 import com.prodyna.pac.voting.web.rest.converter.VoteConverter;
 import com.prodyna.pac.voting.web.rest.dto.VoteDTO;
+import com.prodyna.pac.voting.web.rest.dto.VoteOptionDTO;
+
+import edu.emory.mathcs.backport.java.util.Collections;
 
 /**
  * Test class for the VoteResource REST controller.
@@ -58,9 +64,13 @@ public class VoteResourceIntTest
     private static final LocalDate UPDATED_CREATED = LocalDate.now();
     private static final String DEFAULT_TOPIC = "AAAAA";
     private static final String UPDATED_TOPIC = "BBBBB";
+    private static final String DEFAULT_TEXT = "AAAAA";
 
     @Inject
     private VoteService voteService;
+
+    @Inject
+    private VoteOptionsService voteOptionsService;
 
     @Inject
     private UserService userService;
@@ -71,6 +81,7 @@ public class VoteResourceIntTest
     private MockMvc restVoteMockMvc;
 
     private VoteDTO voteDTO;
+    private VoteOptionDTO voteOptionDTO;
     private Vote vote;
     private Sort sorting;
 
@@ -105,6 +116,10 @@ public class VoteResourceIntTest
         this.voteDTO.setUserId(DEFAULT_CREATOR_ID);
         this.voteDTO.setUserVoted(DEFAULT_USER_VOTED);
 
+        this.voteOptionDTO = new VoteOptionDTO();
+        this.voteOptionDTO.setText(DEFAULT_TEXT);
+        this.voteDTO.setVoteOptions(Collections.singletonList(this.voteOptionDTO));
+
         this.vote = VoteConverter.toEntity(this.voteDTO, this.userService);
     }
 
@@ -119,9 +134,9 @@ public class VoteResourceIntTest
     public void createVote() throws Exception
     {
         final int databaseSizeBeforeCreate = this.voteService.getAll(this.sorting).size();
+        final int databaseSizeOptionsBeforeCreate = this.voteOptionsService.findAll().size();
 
         // Create the Vote
-
         this.restVoteMockMvc.perform(MockMvcRequestBuilders.post("/api/votes")
                 .contentType(TestUtil.APPLICATION_JSON_UTF8)
                 .content(TestUtil.convertObjectToJsonBytes(this.voteDTO)))
@@ -130,10 +145,14 @@ public class VoteResourceIntTest
         // Validate the Vote in the database
         final List<Vote> votes = this.voteService.getAll(this.sorting);
         Assertions.assertThat(votes).hasSize(databaseSizeBeforeCreate + 1);
+
         final Vote testVote = votes.get(votes.size() - 1);
         Assertions.assertThat(testVote.getCreated()).isEqualTo(VoteResourceIntTest.DEFAULT_CREATED);
         Assertions.assertThat(testVote.getTopic()).isEqualTo(VoteResourceIntTest.DEFAULT_TOPIC);
 
+        // Validate the VoteOption in the database
+        final int databaseSizeOptionsAfterCreate = this.voteOptionsService.findAll().size();
+        Assertions.assertThat(databaseSizeOptionsBeforeCreate +1).isEqualTo(databaseSizeOptionsAfterCreate);
     }
 
     @Test
@@ -226,7 +245,32 @@ public class VoteResourceIntTest
         final Vote testVote = votes.get(votes.size() - 1);
         Assertions.assertThat(testVote.getCreated()).isEqualTo(VoteResourceIntTest.UPDATED_CREATED);
         Assertions.assertThat(testVote.getTopic()).isEqualTo(VoteResourceIntTest.UPDATED_TOPIC);
+    }
 
+    @Ignore("TODO")
+    @Test
+    @Transactional
+    public void updateVoteRemoveOption() throws Exception
+    {
+        // Initialize the database
+        this.voteService.save(this.vote);
+
+        final Long voteOptionId = this.vote.getVoteOptions().iterator().next().getId();
+        final int databaseSizeBeforeUpdate = this.voteOptionsService.findAll().size();
+
+        // Update the vote
+        final VoteDTO updatedVote = this.voteDTO;
+
+        this.restVoteMockMvc.perform(MockMvcRequestBuilders.put("/api/votes")
+                .contentType(TestUtil.APPLICATION_JSON_UTF8)
+                .content(TestUtil.convertObjectToJsonBytes(updatedVote)))
+        .andExpect(MockMvcResultMatchers.status().isOk());
+
+        // Validate that VoteOption is not in the database
+        final int databaseSizeAfterUpdate = this.voteOptionsService.findAll().size();
+        Assertions.assertThat(databaseSizeBeforeUpdate -1).isEqualTo(databaseSizeAfterUpdate);
+        final VoteOption voteOption = this.voteOptionsService.findOne(voteOptionId);
+        Assertions.assertThat(voteOption).isNull();
     }
 
     @Test
@@ -255,11 +299,11 @@ public class VoteResourceIntTest
         // Initialize the database
         this.voteService.save(this.vote);
 
-        final UserVotings userVotings = new UserVotings();
-        userVotings.setUserId(DEFAULT_CREATOR_ID);
-        userVotings.setVoteId(this.vote.getId());
-        userVotings.setVoteOptionsId(1L);
-        this.userVotingsService.save(userVotings);
+        final UserVotings userVotingsDTO = new UserVotings();
+        userVotingsDTO.setUserId(DEFAULT_CREATOR_ID);
+        userVotingsDTO.setVoteId(this.vote.getId());
+        userVotingsDTO.setVoteOptionsId(1L);
+        this.userVotingsService.save(userVotingsDTO);
 
         final int voteIdIntValue = this.vote.getId().intValue();
         this.restVoteMockMvc.perform(MockMvcRequestBuilders.get("/api/votes/{id}/votings", voteIdIntValue))
@@ -281,6 +325,5 @@ public class VoteResourceIntTest
         .andExpect(MockMvcResultMatchers.status().isOk())
         .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
         .andExpect(MockMvcResultMatchers.jsonPath("$.[*].userId").value(Matchers.hasItem(creatorIdIntValue)));
-
     }
 }
